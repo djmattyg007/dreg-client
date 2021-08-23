@@ -1,18 +1,19 @@
 import time
 
-import docker
 import pytest
 import requests
+from docker import DockerClient, from_env
+from docker.models.containers import Container
 from requests import exceptions
 
 
 @pytest.fixture(scope="session")
-def docker_client():
-    return docker.from_env()
+def docker_client() -> DockerClient:
+    return from_env()
 
 
-def wait_till_up(url, attempts):
-    for i in range(attempts - 1):
+def wait_till_up(url: str, attempts: int) -> None:
+    for i in range(attempts):
         try:
             requests.get(url)
             return
@@ -23,24 +24,21 @@ def wait_till_up(url, attempts):
 
 
 @pytest.fixture
-def registry(docker_client):
+def registry(docker_client: DockerClient):
     cli = docker_client
-    cli.pull("registry", "2")
-    cont = cli.create_container(
+    cli.images.pull("registry", "2")
+    container: Container = cli.containers.create(
         "registry:2",
-        ports=[5000],
-        host_config=cli.create_host_config(
-            port_bindings={
-                5000: 5000,
-            },
-        ),
+        ports={
+            5000: 5000,
+        },
     )
     try:
-        cli.start(cont)
+        container.start()
         wait_till_up("http://localhost:5000", 3)
         try:
             yield
         finally:
-            cli.stop(cont)
+            container.stop()
     finally:
-        cli.remove_container(cont, v=True, force=True)
+        container.remove(v=True, force=True)
