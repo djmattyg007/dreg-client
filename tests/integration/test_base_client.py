@@ -1,6 +1,6 @@
 import pkg_resources
 
-from docker_registry_client import BaseClient
+from dreg_client import BaseClient
 
 
 def test_base_client(registry):

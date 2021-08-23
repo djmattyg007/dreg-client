@@ -2,7 +2,6 @@ import json
 import logging
 
 from requests import delete, get, put
-from requests.exceptions import HTTPError
 
 from .AuthorizationService import AuthorizationService
 from .manifest import sign as sign_manifest

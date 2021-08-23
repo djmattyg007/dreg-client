@@ -15,10 +15,12 @@ limitations under the License.
 """
 
 import argparse
-from docker_registry_client import DockerRegistryClient
 import json
 import logging
+
 import requests
+
+from dreg_client import DockerRegistryClient
 
 
 class CLI(object):
@@ -28,22 +30,25 @@ class CLI(object):
         excl_group.add_argument("-q", "--quiet", action="store_true")
         excl_group.add_argument("-v", "--verbose", action="store_true")
 
-        self.parser.add_argument('--verify-ssl', dest='verify_ssl',
-                                 action='store_true')
-        self.parser.add_argument('--no-verify-ssl', dest='verify_ssl',
-                                 action='store_false')
-        self.parser.add_argument('--username', metavar='USERNAME')
-        self.parser.add_argument('--password', metavar='PASSWORD')
+        self.parser.add_argument("--verify-ssl", dest="verify_ssl", action="store_true")
+        self.parser.add_argument("--no-verify-ssl", dest="verify_ssl", action="store_false")
+        self.parser.add_argument("--username", metavar="USERNAME")
+        self.parser.add_argument("--password", metavar="PASSWORD")
 
-        self.parser.add_argument('--authorization-service', metavar='AUTH_SERVICE', type=str,
-                                 help='authorization service URL (including scheme)')
+        self.parser.add_argument(
+            "--authorization-service",
+            metavar="AUTH_SERVICE",
+            type=str,
+            help="authorization service URL (including scheme)",
+        )
 
-        self.parser.add_argument('registry', metavar='REGISTRY', nargs=1,
-                                 help='registry URL (including scheme)')
-        self.parser.add_argument('repository', metavar='REPOSITORY', nargs='?',
-                                 help='repository (including namespace)')
-        self.parser.add_argument('ref', metavar='REF', nargs='?',
-                                 help='tag or digest')
+        self.parser.add_argument(
+            "registry", metavar="REGISTRY", nargs=1, help="registry URL (including scheme)"
+        )
+        self.parser.add_argument(
+            "repository", metavar="REPOSITORY", nargs="?", help="repository (including namespace)"
+        )
+        self.parser.add_argument("ref", metavar="REF", nargs="?", help="tag or digest")
 
         self.parser.set_defaults(verify_ssl=True)
 
@@ -52,21 +57,23 @@ class CLI(object):
 
         basic_config_args = {}
         if args.verbose:
-            basic_config_args['level'] = logging.DEBUG
+            basic_config_args["level"] = logging.DEBUG
         elif args.quiet:
-            basic_config_args['level'] = logging.WARNING
+            basic_config_args["level"] = logging.WARNING
 
         logging.basicConfig(**basic_config_args)
 
         kwargs = {
-            'username': args.username,
-            'password': args.password,
+            "username": args.username,
+            "password": args.password,
         }
 
-        client = DockerRegistryClient(args.registry[0],
-                                      auth_service_url=args.authorization_service,
-                                      verify_ssl=args.verify_ssl,
-                                      **kwargs)
+        client = DockerRegistryClient(
+            args.registry[0],
+            auth_service_url=args.authorization_service,
+            verify_ssl=args.verify_ssl,
+            **kwargs,
+        )
 
         if args.repository:
             if args.ref:
@@ -117,7 +124,7 @@ class CLI(object):
             print(json.dumps(manifest, indent=2, sort_keys=True))
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     try:
         cli = CLI()
         cli.run()

@@ -10,7 +10,7 @@ line-length = 100
 [tool.coverage.run]
 branch = true
 include = [
-    "docker_registry_client/*",
+    "dreg_client/*",
 ]
 omit = [
     "tests/*",

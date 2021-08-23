@@ -4,7 +4,7 @@ from flexmock import flexmock
 from requests.exceptions import HTTPError
 from requests.models import Response
 
-from docker_registry_client import _BaseClient
+from dreg_client import _BaseClient
 
 
 REGISTRY_URL = "https://registry.example.com:5000"
@@ -46,7 +46,7 @@ class MockRegistry(object):
     DELETE_MAP = {}
 
     @staticmethod
-    def format(s):
+    def format_url(s):
         return s.format(
             namespace=TEST_NAMESPACE,
             repo=TEST_REPO,
@@ -57,7 +57,7 @@ class MockRegistry(object):
 
     def call(self, response_map, url, data=None, headers=None):
         assert url.startswith(REGISTRY_URL)
-        request = self.format(url[len(REGISTRY_URL) :])
+        request = self.format_url(url[len(REGISTRY_URL) :])
         try:
             return response_map[request]
         except KeyError:
@@ -71,10 +71,10 @@ class MockRegistry(object):
 
 
 class MockV2Registry(MockRegistry):
-    TAGS = MockRegistry.format("/v2/{name}/tags/list")
-    TAGS_LIBRARY = MockRegistry.format("/v2/{repo}/tags/list")
-    MANIFEST_TAG = MockRegistry.format("/v2/{name}/manifests/{tag}")
-    MANIFEST_DIGEST = MockRegistry.format("/v2/{name}/manifests/{digest}")
+    TAGS = MockRegistry.format_url("/v2/{name}/tags/list")
+    TAGS_LIBRARY = MockRegistry.format_url("/v2/{repo}/tags/list")
+    MANIFEST_TAG = MockRegistry.format_url("/v2/{name}/manifests/{tag}")
+    MANIFEST_DIGEST = MockRegistry.format_url("/v2/{name}/manifests/{digest}")
 
     GET_MAP = {
         "/v2/": MockResponse(200),

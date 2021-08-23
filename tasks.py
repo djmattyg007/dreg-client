@@ -14,13 +14,13 @@ else:
 
 @task
 def reformat(c):
-    c.run("isort docker_registry_client tests setup.py tasks.py", pty=pty)
-    c.run("black docker_registry_client tests setup.py tasks.py", pty=pty)
+    c.run("isort dreg_client tests setup.py tasks.py docker-registry-show.py", pty=pty)
+    c.run("black dreg_client tests setup.py tasks.py docker-registry-show.py", pty=pty)
 
 
 @task
 def lint(c):
-    c.run("flake8 --show-source --statistics docker_registry_client tests", pty=pty)
+    c.run("flake8 --show-source --statistics dreg_client tests docker-registry-show.py", pty=pty)
     c.run("check-manifest", pty=pty)
 
 
@@ -29,7 +29,7 @@ def test(c, onefile=""):
     pytest_args = [
         "pytest",
         "--strict-config",
-        "--cov=docker_registry_client",
+        "--cov=dreg_client",
         "--cov-report=term-missing",
     ]
     if in_ci:
