@@ -40,7 +40,9 @@ History
 -------
 
 dreg-client is a fork of a project named `docker-registry-client <https://github.com/yodle/docker-registry-client>`_.
-I forked it to make some improvements, add type hints (pending), and to resolve several outstanding problems at the time.
+While it looked good, development has stalled, with approved PRs remaining unmerged. The code design was also hostile
+to strict type checking. I forked it to make some improvements, add type hints (pending), and to resolve several
+outstanding problems at the time.
 
 Alternatives
 ------------
