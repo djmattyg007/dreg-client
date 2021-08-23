@@ -84,10 +84,6 @@ class BaseClientV2(CommonBaseClient):
             api_timeout=self.method_kwargs.get("api_timeout"),
         )
 
-    @property
-    def version(self):
-        return 2
-
     def check_status(self):
         self.auth.desired_scope = "registry:catalog:*"
         return self._http_call("/v2/", get)

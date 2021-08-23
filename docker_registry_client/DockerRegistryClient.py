@@ -17,12 +17,10 @@ class DockerRegistryClient(object):
 
         :param host: str, registry URL including scheme
         :param verify_ssl: bool, whether to verify SSL certificate
-        :param api_version: int, API version to require
         :param username: username to use for basic authentication when
           connecting to the registry
         :param password: password to use for basic authentication
-        :param auth_service_url: authorization service URL (including scheme,
-          for v2 only)
+        :param auth_service_url: authorization service URL (including scheme)
         :param api_timeout: timeout for external request
         """
 
@@ -34,7 +32,6 @@ class DockerRegistryClient(object):
             auth_service_url=auth_service_url,
             api_timeout=api_timeout,
         )
-        self.api_version = self._base_client.version
         self._repositories = {}
         self._repositories_by_namespace = {}
 
@@ -62,24 +59,6 @@ class DockerRegistryClient(object):
         return self._repositories
 
     def refresh(self):
-        if self._base_client.version == 1:
-            self._refresh_v1()
-        else:
-            assert self._base_client.version == 2
-            self._refresh_v2()
-
-    def _refresh_v1(self):
-        _repositories = self._base_client.search()["results"]
-        for repository in _repositories:
-            name = repository["name"]
-            ns, repo = name.split("/", 1)
-
-            r = Repository(self._base_client, repo, namespace=ns)
-            self._repositories_by_namespace.setdefault(ns, {})
-            self._repositories_by_namespace[ns][name] = r
-            self._repositories[name] = r
-
-    def _refresh_v2(self):
         repositories = self._base_client.catalog()["repositories"]
         for name in repositories:
             try:
