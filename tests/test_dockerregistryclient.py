@@ -62,5 +62,5 @@ class TestDockerRegistryClient(object):
         url = mock_v2_registry()
         client = DockerRegistryClient(url)
         repository = client.repositories()[TEST_NAME]
-        manifest, digest = repository.manifest(TEST_TAG)
+        digest, manifest = repository.manifest(TEST_TAG)
         repository.delete_manifest(digest)

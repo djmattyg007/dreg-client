@@ -96,10 +96,9 @@ class BaseClientV2(CommonBaseClient):
         self.auth.desired_scope = "repository:%s:*" % name
         return self._http_call(self.LIST_TAGS, get, name=name)
 
-    def get_manifest_and_digest(self, name, reference):
+    def get_digest_and_manifest(self, name, reference):
         m = self.get_manifest(name, reference)
-        # TODO: Swap order of digest and content
-        return m._content, m._digest
+        return m._digest, m._content
 
     def get_manifest(self, name, reference):
         self.auth.desired_scope = "repository:%s:*" % name

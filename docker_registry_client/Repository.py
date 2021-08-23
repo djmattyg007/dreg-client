@@ -27,9 +27,9 @@ class RepositoryV2(BaseRepository):
 
     def manifest(self, tag):
         """
-        Return a tuple, (manifest, digest), for a given tag
+        Return a tuple, (digest, manifest), for a given tag
         """
-        return self._client.get_manifest_and_digest(self.name, tag)
+        return self._client.get_digest_and_manifest(self.name, tag)
 
     def delete_manifest(self, digest):
         return self._client.delete_manifest(self.name, digest)
