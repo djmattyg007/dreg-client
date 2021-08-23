@@ -95,12 +95,7 @@ class MockV2Registry(MockRegistry):
     }
 
 
-def mock_v2_registry():
+def mock_registry():
     v2_registry = MockV2Registry()
     flexmock(_BaseClient, get=v2_registry.get, delete=v2_registry.delete)
     return REGISTRY_URL
-
-
-def mock_registry():
-    # TODO: Eliminate this, rename mock_v2_registry to mock_registry
-    return mock_v2_registry()

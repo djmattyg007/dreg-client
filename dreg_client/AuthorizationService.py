@@ -14,8 +14,7 @@ class AuthorizationService(object):
     https://github.com/docker/distribution/blob/master/docs/spec/auth/token.md
 
     The idea is to delegate authentication to a third party and use a token to
-    authenticate to the registry. Token has to be renew each time we change
-    "scope".
+    authenticate to the registry. Token has to be renew each time we change "scope".
     """
 
     def __init__(self, registry, url="", auth=None, verify=False, api_timeout=None):
