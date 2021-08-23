@@ -1,9 +1,9 @@
 import time
 
-import requests
-from requests import exceptions
 import docker
 import pytest
+import requests
+from requests import exceptions
 
 
 @pytest.fixture(scope="session")
@@ -12,12 +12,12 @@ def docker_client():
 
 
 def wait_till_up(url, attempts):
-    for i in range(attempts-1):
+    for i in range(attempts - 1):
         try:
             requests.get(url)
             return
         except exceptions.ConnectionError as e:
-            time.sleep(0.1 * 2**i)
+            time.sleep(0.1 * 2 ** i)
     else:
         requests.get(url)
 
@@ -25,9 +25,9 @@ def wait_till_up(url, attempts):
 @pytest.fixture
 def registry(docker_client):
     cli = docker_client
-    cli.pull('registry', '2')
+    cli.pull("registry", "2")
     cont = cli.create_container(
-        'registry:2',
+        "registry:2",
         ports=[5000],
         host_config=cli.create_host_config(
             port_bindings={
@@ -37,7 +37,7 @@ def registry(docker_client):
     )
     try:
         cli.start(cont)
-        wait_till_up('http://localhost:5000', 3)
+        wait_till_up("http://localhost:5000", 3)
         try:
             yield
         finally:

@@ -13,12 +13,11 @@ class BaseRepository(object):
 
 class RepositoryV2(BaseRepository):
     def __init__(self, client, repository, namespace=None):
-        super(RepositoryV2, self).__init__(client, repository,
-                                           namespace=namespace)
+        super(RepositoryV2, self).__init__(client, repository, namespace=namespace)
         self._tags = None
 
     def __repr__(self):
-        return 'RepositoryV2({name})'.format(name=self.name)
+        return "RepositoryV2({name})".format(name=self.name)
 
     def tags(self):
         if self._tags is None:
@@ -37,7 +36,7 @@ class RepositoryV2(BaseRepository):
 
     def refresh(self):
         response = self._client.get_repository_tags(self.name)
-        self._tags = response['tags']
+        self._tags = response["tags"]
 
 
 def Repository(client, *args, **kwargs):

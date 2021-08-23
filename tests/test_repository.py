@@ -1,8 +1,7 @@
-from docker_registry_client.Repository import Repository
 from docker_registry_client._BaseClient import BaseClientV2
-from .drc_test_utils.mock_registry import (
-    mock_v2_registry, TEST_NAME,
-)
+from docker_registry_client.Repository import Repository
+
+from .drc_test_utils.mock_registry import TEST_NAME, mock_v2_registry
 
 
 def test_initv2():

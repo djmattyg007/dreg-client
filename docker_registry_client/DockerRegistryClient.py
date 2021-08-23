@@ -3,8 +3,15 @@ from .Repository import Repository
 
 
 class DockerRegistryClient(object):
-    def __init__(self, host, verify_ssl=None, username=None,
-                 password=None, auth_service_url="", api_timeout=None):
+    def __init__(
+        self,
+        host,
+        verify_ssl=None,
+        username=None,
+        password=None,
+        auth_service_url="",
+        api_timeout=None,
+    ):
         """
         Constructor
 
@@ -19,10 +26,14 @@ class DockerRegistryClient(object):
         :param api_timeout: timeout for external request
         """
 
-        self._base_client = BaseClient(host, verify_ssl=verify_ssl,
-                                       username=username, password=password,
-                                       auth_service_url=auth_service_url,
-                                       api_timeout=api_timeout)
+        self._base_client = BaseClient(
+            host,
+            verify_ssl=verify_ssl,
+            username=username,
+            password=password,
+            auth_service_url=auth_service_url,
+            api_timeout=api_timeout,
+        )
         self.api_version = self._base_client.version
         self._repositories = {}
         self._repositories_by_namespace = {}
@@ -34,10 +45,10 @@ class DockerRegistryClient(object):
         return list(self._repositories_by_namespace.keys())
 
     def repository(self, repository, namespace=None):
-        if '/' in repository:
+        if "/" in repository:
             if namespace is not None:
-                raise RuntimeError('cannot specify namespace twice')
-            namespace, repository = repository.split('/', 1)
+                raise RuntimeError("cannot specify namespace twice")
+            namespace, repository = repository.split("/", 1)
 
         return Repository(self._base_client, repository, namespace=namespace)
 
@@ -58,10 +69,10 @@ class DockerRegistryClient(object):
             self._refresh_v2()
 
     def _refresh_v1(self):
-        _repositories = self._base_client.search()['results']
+        _repositories = self._base_client.search()["results"]
         for repository in _repositories:
-            name = repository['name']
-            ns, repo = name.split('/', 1)
+            name = repository["name"]
+            ns, repo = name.split("/", 1)
 
             r = Repository(self._base_client, repo, namespace=ns)
             self._repositories_by_namespace.setdefault(ns, {})
@@ -69,10 +80,10 @@ class DockerRegistryClient(object):
             self._repositories[name] = r
 
     def _refresh_v2(self):
-        repositories = self._base_client.catalog()['repositories']
+        repositories = self._base_client.catalog()["repositories"]
         for name in repositories:
             try:
-                ns, repo = name.split('/', 1)
+                ns, repo = name.split("/", 1)
             except ValueError:
                 ns = None
                 repo = name
@@ -80,7 +91,7 @@ class DockerRegistryClient(object):
             r = Repository(self._base_client, repo, namespace=ns)
 
             if ns is None:
-                ns = 'library'
+                ns = "library"
 
             self._repositories_by_namespace.setdefault(ns, {})
             self._repositories_by_namespace[ns][name] = r

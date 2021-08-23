@@ -1,9 +1,14 @@
+import pytest
+
 from docker_registry_client import DockerRegistryClient
 from docker_registry_client.Repository import BaseRepository
-import pytest
+
 from .drc_test_utils.mock_registry import (
-    mock_v2_registry, TEST_NAMESPACE, TEST_REPO, TEST_NAME,
+    TEST_NAME,
+    TEST_NAMESPACE,
+    TEST_REPO,
     TEST_TAG,
+    mock_v2_registry,
 )
 
 
@@ -13,11 +18,14 @@ class TestDockerRegistryClient(object):
         client = DockerRegistryClient(url)
         assert client.namespaces() == [TEST_NAMESPACE]
 
-    @pytest.mark.parametrize(('repository', 'namespace'), [
-        (TEST_REPO, None),
-        (TEST_REPO, TEST_NAMESPACE),
-        ('{0}/{1}'.format(TEST_NAMESPACE, TEST_REPO), None),
-    ])
+    @pytest.mark.parametrize(
+        ("repository", "namespace"),
+        [
+            (TEST_REPO, None),
+            (TEST_REPO, TEST_NAMESPACE),
+            ("{0}/{1}".format(TEST_NAMESPACE, TEST_REPO), None),
+        ],
+    )
     def test_repository(self, repository, namespace):
         url = mock_v2_registry()
         client = DockerRegistryClient(url)
@@ -28,9 +36,9 @@ class TestDockerRegistryClient(object):
         url = mock_v2_registry()
         client = DockerRegistryClient(url)
         with pytest.raises(RuntimeError):
-            client.repository('{0}/{1}'.format(TEST_NAMESPACE, TEST_REPO), namespace=TEST_NAMESPACE)
+            client.repository("{0}/{1}".format(TEST_NAMESPACE, TEST_REPO), namespace=TEST_NAMESPACE)
 
-    @pytest.mark.parametrize('namespace', [TEST_NAMESPACE, None])
+    @pytest.mark.parametrize("namespace", [TEST_NAMESPACE, None])
     def test_repositories(self, namespace):
         url = mock_v2_registry()
         client = DockerRegistryClient(url)

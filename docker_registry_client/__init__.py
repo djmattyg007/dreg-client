@@ -1,1 +1,1 @@
-from .DockerRegistryClient import (DockerRegistryClient, BaseClient, Repository)
+from .DockerRegistryClient import BaseClient, DockerRegistryClient, Repository

@@ -1,16 +1,18 @@
-from flexmock import flexmock
-from docker_registry_client import _BaseClient
 import json
+
+from flexmock import flexmock
 from requests.exceptions import HTTPError
 from requests.models import Response
 
+from docker_registry_client import _BaseClient
+
 
 REGISTRY_URL = "https://registry.example.com:5000"
-TEST_NAMESPACE = 'library'
-TEST_REPO = 'myrepo'
-TEST_NAME = '%s/%s' % (TEST_NAMESPACE, TEST_REPO)
-TEST_TAG = 'latest'
-TEST_MANIFEST_DIGEST = 'sha256:6c3c624b58dbbcd3c0dd82b4c53f04194d1247c6eebdaab7c610cf7d66709b3b'
+TEST_NAMESPACE = "library"
+TEST_REPO = "myrepo"
+TEST_NAME = "%s/%s" % (TEST_NAMESPACE, TEST_REPO)
+TEST_TAG = "latest"
+TEST_MANIFEST_DIGEST = "sha256:6c3c624b58dbbcd3c0dd82b4c53f04194d1247c6eebdaab7c610cf7d66709b3b"
 
 
 class MockResponse(object):
@@ -18,9 +20,9 @@ class MockResponse(object):
         self.ok = 200 <= code < 400
         self.status_code = code
         self.data = data
-        self.text = text or ''
+        self.text = text or ""
         self.headers = headers or {}
-        self.reason = ''
+        self.reason = ""
 
     @property
     def content(self):
@@ -45,19 +47,21 @@ class MockRegistry(object):
 
     @staticmethod
     def format(s):
-        return s.format(namespace=TEST_NAMESPACE,
-                        repo=TEST_REPO,
-                        name=TEST_NAME,
-                        tag=TEST_TAG,
-                        digest=TEST_MANIFEST_DIGEST)
+        return s.format(
+            namespace=TEST_NAMESPACE,
+            repo=TEST_REPO,
+            name=TEST_NAME,
+            tag=TEST_TAG,
+            digest=TEST_MANIFEST_DIGEST,
+        )
 
     def call(self, response_map, url, data=None, headers=None):
         assert url.startswith(REGISTRY_URL)
-        request = self.format(url[len(REGISTRY_URL):])
+        request = self.format(url[len(REGISTRY_URL) :])
         try:
             return response_map[request]
         except KeyError:
-            return MockResponse(code=404, text='Not found: %s' % request)
+            return MockResponse(code=404, text="Not found: %s" % request)
 
     def get(self, *args, **kwargs):
         return self.call(self.GET_MAP, *args, **kwargs)
@@ -67,34 +71,23 @@ class MockRegistry(object):
 
 
 class MockV2Registry(MockRegistry):
-    TAGS = MockRegistry.format('/v2/{name}/tags/list')
-    TAGS_LIBRARY = MockRegistry.format('/v2/{repo}/tags/list')
-    MANIFEST_TAG = MockRegistry.format('/v2/{name}/manifests/{tag}')
-    MANIFEST_DIGEST = MockRegistry.format('/v2/{name}/manifests/{digest}')
+    TAGS = MockRegistry.format("/v2/{name}/tags/list")
+    TAGS_LIBRARY = MockRegistry.format("/v2/{repo}/tags/list")
+    MANIFEST_TAG = MockRegistry.format("/v2/{name}/manifests/{tag}")
+    MANIFEST_DIGEST = MockRegistry.format("/v2/{name}/manifests/{digest}")
 
     GET_MAP = {
-        '/v2/': MockResponse(200),
-
-        '/v2/_catalog': MockResponse(200, data={'repositories': [TEST_NAME]}),
-
-        TAGS:
-        MockResponse(200, data={'name': TEST_NAME,
-                                'tags': [TEST_TAG]}),
-
-        TAGS_LIBRARY:
-        MockResponse(200, data={'name': TEST_NAME,
-                                'tags': [TEST_TAG]}),
-
-        MANIFEST_TAG:
-        MockResponse(200,
-                     data={
-                         'name': TEST_NAME,
-                         'tag': TEST_TAG,
-                         'fsLayers': []
-                     },
-                     headers={
-                         'Docker-Content-Digest': TEST_MANIFEST_DIGEST,
-                     }),
+        "/v2/": MockResponse(200),
+        "/v2/_catalog": MockResponse(200, data={"repositories": [TEST_NAME]}),
+        TAGS: MockResponse(200, data={"name": TEST_NAME, "tags": [TEST_TAG]}),
+        TAGS_LIBRARY: MockResponse(200, data={"name": TEST_NAME, "tags": [TEST_TAG]}),
+        MANIFEST_TAG: MockResponse(
+            200,
+            data={"name": TEST_NAME, "tag": TEST_TAG, "fsLayers": []},
+            headers={
+                "Docker-Content-Digest": TEST_MANIFEST_DIGEST,
+            },
+        ),
     }
 
     DELETE_MAP = {
@@ -104,9 +97,7 @@ class MockV2Registry(MockRegistry):
 
 def mock_v2_registry():
     v2_registry = MockV2Registry()
-    flexmock(_BaseClient,
-             get=v2_registry.get,
-             delete=v2_registry.delete)
+    flexmock(_BaseClient, get=v2_registry.get, delete=v2_registry.delete)
     return REGISTRY_URL
 
 

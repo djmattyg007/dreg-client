@@ -14,8 +14,8 @@ else:
 
 @task
 def reformat(c):
-    c.run("isort freiner tests setup.py tasks.py", pty=pty)
-    c.run("black freiner tests setup.py tasks.py", pty=pty)
+    c.run("isort docker_registry_client tests setup.py tasks.py", pty=pty)
+    c.run("black docker_registry_client tests setup.py tasks.py", pty=pty)
 
 
 @task
@@ -26,7 +26,12 @@ def lint(c):
 
 @task
 def test(c, onefile=""):
-    pytest_args = ["pytest", "--strict-config", "--cov=docker_registry_client", "--cov-report=term-missing"]
+    pytest_args = [
+        "pytest",
+        "--strict-config",
+        "--cov=docker_registry_client",
+        "--cov-report=term-missing",
+    ]
     if in_ci:
         pytest_args.extend(("--cov-report-xml", "--strict-markers"))
     else:
