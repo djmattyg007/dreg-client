@@ -1,30 +1,4 @@
-from setuptools import setup, find_packages
+from setuptools import setup
 
-readme = open('README.rst').read()
-history = open('CHANGES.rst').read().replace('.. :changelog:', '')
 
-setup(
-    name="docker-registry-client",
-    version='0.5.2.dev0',
-    description='Client for Docker Registry V1 and V2',
-    long_description=readme + '\n\n' + history,
-    author='John Downs',
-    author_email='john.downs@yodle.com',
-    url='https://github.com/yodle/docker-registry-client',
-    license="Apache License 2.0",
-    classifiers=[
-        'Development Status :: 4 - Beta',
-        'Intended Audience :: Developers',
-        'Topic :: System :: Software Distribution',
-        'License :: OSI Approved :: Apache Software License',
-        'Programming Language :: Python :: 3',
-        'Programming Language :: Python :: 3.9',
-    ],
-    keywords='docker registry docker-registry REST API',
-    packages=find_packages(),
-    install_requires=[
-        'requests>=2.22.0, <3.0.0',
-        'ecdsa>=0.17.0, <0.18.0',
-        'jws>=0.1.3, <0.2.0',
-    ],
-)
+setup()

@@ -1,19 +1,21 @@
 Docker Registry Client
 ======================
 
-|Build Status| |pypi|
+|ci| |pypi| |license|
 
 A Python REST client for the Docker Registry
 
 It's useful for automating image tagging and untagging
 
-.. |Build Status| image:: https://travis-ci.org/yodle/docker-registry-client.svg?branch=master
-   :target: https://travis-ci.org/yodle/docker-registry-client
+.. |ci| image:: https://github.com/djmattyg007/dreg-client/workflows/CI/badge.svg?branch=master
+   :target: https://github.com/djmattyg007/dreg-client/actions?query=branch%3Amain+workflow%3ACI
    :alt: Build status
-
 .. |pypi| image:: https://img.shields.io/pypi/v/dreg-client.svg
-    :target: https://pypi.org/project/dreg-client
-    :alt: Latest version released on PyPI
+   :target: https://pypi.org/project/dreg-client
+   :alt: Latest version released on PyPI
+.. |license| image:: https://img.shields.io/pypi/l/dreg-client.svg
+   :target: https://pypi.org/project/dreg-client
+   :alt: Apache License 2.0
 
 Usage
 -----
@@ -33,6 +35,12 @@ The API provides several classes: ``DockerRegistryClient``, ``Repository``.
 - ``image(tag)`` -> the image associated with ``tag``
 - ``untag(tag)`` -> remove ``tag`` from the repository
 - ``tag(tag, image_id)`` -> apply ``tag`` to ``image_id``
+
+History
+-------
+
+dreg-client is a fork of a project named `docker-registry-client <https://github.com/yodle/docker-registry-client>`_.
+I forked it to make some improvements, add type hints (pending), and to resolve several outstanding problems at the time.
 
 Alternatives
 ------------

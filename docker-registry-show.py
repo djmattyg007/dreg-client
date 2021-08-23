@@ -36,7 +36,7 @@ class CLI(object):
         self.parser.add_argument('--password', metavar='PASSWORD')
 
         self.parser.add_argument('--authorization-service', metavar='AUTH_SERVICE', type=str,
-                                 help='authorization service URL (including scheme) (for registry v2 only)')
+                                 help='authorization service URL (including scheme)')
 
         self.parser.add_argument('registry', metavar='REGISTRY', nargs=1,
                                  help='registry URL (including scheme)')
