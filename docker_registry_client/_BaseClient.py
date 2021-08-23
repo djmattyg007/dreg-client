@@ -5,11 +5,6 @@ import json
 from .AuthorizationService import AuthorizationService
 from .manifest import sign as sign_manifest
 
-# urllib3 throws some ssl warnings with older versions of python
-#   they're probably ok for the registry client to ignore
-import warnings
-warnings.filterwarnings("ignore")
-
 
 logger = logging.getLogger(__name__)
 
@@ -57,80 +52,6 @@ class CommonBaseClient(object):
             return {}
 
         return response.json()
-
-
-class BaseClientV1(CommonBaseClient):
-    IMAGE_LAYER = '/v1/images/{image_id}/layer'
-    IMAGE_JSON = '/v1/images/{image_id}/json'
-    IMAGE_ANCESTRY = '/v1/images/{image_id}/ancestry'
-    REPO = '/v1/repositories/{namespace}/{repository}'
-    TAGS = REPO + '/tags'
-
-    @property
-    def version(self):
-        return 1
-
-    def search(self, q=''):
-        """GET /v1/search"""
-        if q:
-            q = '?q=' + q
-        return self._http_call('/v1/search' + q, get)
-
-    def check_status(self):
-        """GET /v1/_ping"""
-        return self._http_call('/v1/_ping', get)
-
-    def get_images_layer(self, image_id):
-        """GET /v1/images/{image_id}/layer"""
-        return self._http_call(self.IMAGE_LAYER, get, image_id=image_id)
-
-    def put_images_layer(self, image_id, data):
-        """PUT /v1/images/(image_id)/layer"""
-        return self._http_call(self.IMAGE_LAYER, put,
-                               image_id=image_id, data=data)
-
-    def put_image_layer(self, image_id, data):
-        """PUT /v1/images/(image_id)/json"""
-        return self._http_call(self.IMAGE_JSON, put,
-                               data=data, image_id=image_id)
-
-    def get_image_layer(self, image_id):
-        """GET /v1/images/(image_id)/json"""
-        return self._http_call(self.IMAGE_JSON, get, image_id=image_id)
-
-    def get_image_ancestry(self, image_id):
-        """GET /v1/images/(image_id)/ancestry"""
-        return self._http_call(self.IMAGE_ANCESTRY, get, image_id=image_id)
-
-    def get_repository_tags(self, namespace, repository):
-        """GET /v1/repositories/(namespace)/(repository)/tags"""
-        return self._http_call(self.TAGS, get,
-                               namespace=namespace, repository=repository)
-
-    def get_image_id(self, namespace, respository, tag):
-        """GET /v1/repositories/(namespace)/(repository)/tags/(tag*)"""
-        return self._http_call(self.TAGS + '/' + tag, get,
-                               namespace=namespace, repository=respository)
-
-    def get_tag_json(self, namespace, repository, tag):
-        """GET /v1/repositories(namespace)/(repository)tags(tag*)/json"""
-        return self._http_call(self.TAGS + '/' + tag + '/json', get,
-                               namespace=namespace, repository=repository)
-
-    def delete_repository_tag(self, namespace, repository, tag):
-        """DELETE /v1/repositories/(namespace)/(repository)/tags/(tag*)"""
-        return self._http_call(self.TAGS + '/' + tag, delete,
-                               namespace=namespace, repository=repository)
-
-    def set_tag(self, namespace, repository, tag, image_id):
-        """PUT /v1/repositories/(namespace)/(repository)/tags/(tag*)"""
-        return self._http_call(self.TAGS + '/' + tag, put, data=image_id,
-                               namespace=namespace, repository=repository)
-
-    def delete_repository(self, namespace, repository):
-        """DELETE /v1/repositories/(namespace)/(repository)/"""
-        return self._http_call(self.REPO, delete,
-                               namespace=namespace, repository=repository)
 
 
 class _Manifest(object):
@@ -181,6 +102,7 @@ class BaseClientV2(CommonBaseClient):
 
     def get_manifest_and_digest(self, name, reference):
         m = self.get_manifest(name, reference)
+        # TODO: Swap order of digest and content
         return m._content, m._digest
 
     def get_manifest(self, name, reference):
@@ -269,38 +191,9 @@ class BaseClientV2(CommonBaseClient):
         return response
 
 
-def BaseClient(host, verify_ssl=None, api_version=None, username=None,
+def BaseClient(host, verify_ssl=None, username=None,
                password=None, auth_service_url="", api_timeout=None):
-    if api_version == 1:
-        return BaseClientV1(
-            host, verify_ssl=verify_ssl, username=username, password=password,
-            api_timeout=api_timeout,
-        )
-    elif api_version == 2:
-        return BaseClientV2(
-            host, verify_ssl=verify_ssl, username=username, password=password,
-            auth_service_url=auth_service_url, api_timeout=api_timeout,
-        )
-    elif api_version is None:
-        # Try V2 first
-        logger.debug("checking for v2 API")
-        v2_client = BaseClientV2(
-            host, verify_ssl=verify_ssl, username=username, password=password,
-            auth_service_url=auth_service_url, api_timeout=api_timeout,
-        )
-        try:
-            v2_client.check_status()
-        except HTTPError as e:
-            if e.response.status_code == 404:
-                logger.debug("falling back to v1 API")
-                return BaseClientV1(
-                    host, verify_ssl=verify_ssl, username=username,
-                    password=password, api_timeout=api_timeout,
-                )
-
-            raise
-        else:
-            logger.debug("using v2 API")
-            return v2_client
-    else:
-        raise RuntimeError('invalid api_version')
+    return BaseClientV2(
+        host, verify_ssl=verify_ssl, username=username, password=password,
+        auth_service_url=auth_service_url, api_timeout=api_timeout,
+    )

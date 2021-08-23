@@ -1,8 +1,4 @@
-try:
-    from urllib.parse import urlsplit
-except ImportError:
-    from urlparse import urlsplit
-# import urlparse
+from urllib.parse import urlsplit
 import requests
 import logging
 

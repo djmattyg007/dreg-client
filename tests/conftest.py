@@ -1,18 +1,14 @@
-from __future__ import absolute_import
-
 import time
 
 import requests
 from requests import exceptions
 import docker
 import pytest
-from docker import utils as docker_utils
 
 
-@pytest.fixture(scope='session')
+@pytest.fixture(scope="session")
 def docker_client():
-    client_cfg = docker_utils.kwargs_from_env()
-    return docker.Client(version='1.21', **client_cfg)
+    return docker.from_env()
 
 
 def wait_till_up(url, attempts):
@@ -26,7 +22,7 @@ def wait_till_up(url, attempts):
         requests.get(url)
 
 
-@pytest.yield_fixture()
+@pytest.fixture
 def registry(docker_client):
     cli = docker_client
     cli.pull('registry', '2')

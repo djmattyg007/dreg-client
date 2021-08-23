@@ -11,14 +11,14 @@ It's useful for automating image tagging and untagging
    :target: https://travis-ci.org/yodle/docker-registry-client
    :alt: Build status
 
-.. |pypi| image:: https://img.shields.io/pypi/v/docker-registry-client.svg
-    :target: https://pypi.python.org/pypi/docker-registry-client
+.. |pypi| image:: https://img.shields.io/pypi/v/dreg-client.svg
+    :target: https://pypi.org/project/dreg-client
     :alt: Latest version released on PyPI
 
 Usage
 -----
 
-The API provides several classes: ``DockerRegistryClient``, ``Repository``, and ``Image``.
+The API provides several classes: ``DockerRegistryClient``, ``Repository``.
 
 ``DockerRegistryClient`` has the following methods:
 
@@ -33,15 +33,8 @@ The API provides several classes: ``DockerRegistryClient``, ``Repository``, and 
 - ``image(tag)`` -> the image associated with ``tag``
 - ``untag(tag)`` -> remove ``tag`` from the repository
 - ``tag(tag, image_id)`` -> apply ``tag`` to ``image_id``
- 
-``Image`` has the following methods:
-
-- ``get_layer()`` -> binary layer data for image
-- ``get_json()`` -> json metadata for image
-- ``get_data(field)`` -> single field from json data
-- ``ancestry()`` -> ids for image ancestors
 
 Alternatives
 ------------
 
-* `python-dxf <https://pypi.python.org/pypi/python-dxf>`_ (only supports V2)
+* `python-dxf <https://pypi.org/project/python-dxf>`_ (only supports V2)

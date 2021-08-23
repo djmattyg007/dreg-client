@@ -3,12 +3,12 @@ import pkg_resources
 
 
 def test_base_client(registry):
-    cli = BaseClient('http://localhost:5000', api_version=2)
+    cli = BaseClient('http://localhost:5000')
     assert cli.catalog() == {'repositories': []}
 
 
 def test_base_client_edit_manifest(docker_client, registry):
-    cli = BaseClient('http://localhost:5000', api_version=2)
+    cli = BaseClient('http://localhost:5000')
     build = docker_client.build(
         pkg_resources.resource_filename(__name__, 'fixtures/base'),
         'localhost:5000/x-drc-example:x-drc-test', stream=True,

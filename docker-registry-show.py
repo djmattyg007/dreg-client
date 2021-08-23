@@ -14,9 +14,6 @@ See the License for the specific language governing permissions and
 limitations under the License.
 """
 
-
-from __future__ import absolute_import
-
 import argparse
 from docker_registry_client import DockerRegistryClient
 import json
@@ -35,7 +32,6 @@ class CLI(object):
                                  action='store_true')
         self.parser.add_argument('--no-verify-ssl', dest='verify_ssl',
                                  action='store_false')
-        self.parser.add_argument('--api-version', metavar='VER', type=int)
         self.parser.add_argument('--username', metavar='USERNAME')
         self.parser.add_argument('--password', metavar='PASSWORD')
 
@@ -49,7 +45,7 @@ class CLI(object):
         self.parser.add_argument('ref', metavar='REF', nargs='?',
                                  help='tag or digest')
 
-        self.parser.set_defaults(verify_ssl=True, api_version=None)
+        self.parser.set_defaults(verify_ssl=True)
 
     def run(self):
         args = self.parser.parse_args()
@@ -66,9 +62,6 @@ class CLI(object):
             'username': args.username,
             'password': args.password,
         }
-
-        if args.api_version:
-            kwargs['api_version'] = args.api_version
 
         client = DockerRegistryClient(args.registry[0],
                                       auth_service_url=args.authorization_service,
@@ -118,18 +111,10 @@ class CLI(object):
             else:
                 raise
         else:
-            assert client.api_version in [1, 2]
-            if client.api_version == 2:
-                manifest, digest = repo.manifest(ref)
-                print("Digest: {0}".format(digest))
-                print("Manifest:")
-                print(json.dumps(manifest, indent=2, sort_keys=True))
-            else:
-                image = repo.image(ref)
-                image_json = image.get_json()
-                print("Image ID: {0}".format(image.image_id))
-                print("Image JSON:")
-                print(json.dumps(image_json, indent=2, sort_keys=True))
+            manifest, digest = repo.manifest(ref)
+            print("Digest: {0}".format(digest))
+            print("Manifest:")
+            print(json.dumps(manifest, indent=2, sort_keys=True))
 
 
 if __name__ == '__main__':

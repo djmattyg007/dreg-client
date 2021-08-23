@@ -1,11 +1,9 @@
-from __future__ import absolute_import
-
 from ._BaseClient import BaseClient
 from .Repository import Repository
 
 
 class DockerRegistryClient(object):
-    def __init__(self, host, verify_ssl=None, api_version=None, username=None,
+    def __init__(self, host, verify_ssl=None, username=None,
                  password=None, auth_service_url="", api_timeout=None):
         """
         Constructor
@@ -22,7 +20,6 @@ class DockerRegistryClient(object):
         """
 
         self._base_client = BaseClient(host, verify_ssl=verify_ssl,
-                                       api_version=api_version,
                                        username=username, password=password,
                                        auth_service_url=auth_service_url,
                                        api_timeout=api_timeout)
