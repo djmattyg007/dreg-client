@@ -15,6 +15,16 @@ TEST_TAG = "latest"
 TEST_MANIFEST_DIGEST = "sha256:6c3c624b58dbbcd3c0dd82b4c53f04194d1247c6eebdaab7c610cf7d66709b3b"
 
 
+def format_url(s):
+    return s.format(
+        namespace=TEST_NAMESPACE,
+        repo=TEST_REPO,
+        name=TEST_NAME,
+        tag=TEST_TAG,
+        digest=TEST_MANIFEST_DIGEST,
+    )
+
+
 class MockResponse(object):
     def __init__(self, code, data=None, text=None, headers=None):
         self.ok = 200 <= code < 400
@@ -42,39 +52,10 @@ class MockResponse(object):
 
 
 class MockRegistry(object):
-    GET_MAP = {}
-    DELETE_MAP = {}
-
-    @staticmethod
-    def format_url(s):
-        return s.format(
-            namespace=TEST_NAMESPACE,
-            repo=TEST_REPO,
-            name=TEST_NAME,
-            tag=TEST_TAG,
-            digest=TEST_MANIFEST_DIGEST,
-        )
-
-    def call(self, response_map, url, data=None, headers=None):
-        assert url.startswith(REGISTRY_URL)
-        request = self.format_url(url[len(REGISTRY_URL) :])
-        try:
-            return response_map[request]
-        except KeyError:
-            return MockResponse(code=404, text="Not found: %s" % request)
-
-    def get(self, *args, **kwargs):
-        return self.call(self.GET_MAP, *args, **kwargs)
-
-    def delete(self, *args, **kwargs):
-        return self.call(self.DELETE_MAP, *args, **kwargs)
-
-
-class MockV2Registry(MockRegistry):
-    TAGS = MockRegistry.format_url("/v2/{name}/tags/list")
-    TAGS_LIBRARY = MockRegistry.format_url("/v2/{repo}/tags/list")
-    MANIFEST_TAG = MockRegistry.format_url("/v2/{name}/manifests/{tag}")
-    MANIFEST_DIGEST = MockRegistry.format_url("/v2/{name}/manifests/{digest}")
+    TAGS = format_url("/v2/{name}/tags/list")
+    TAGS_LIBRARY = format_url("/v2/{repo}/tags/list")
+    MANIFEST_TAG = format_url("/v2/{name}/manifests/{tag}")
+    MANIFEST_DIGEST = format_url("/v2/{name}/manifests/{digest}")
 
     GET_MAP = {
         "/v2/": MockResponse(200),
@@ -94,8 +75,22 @@ class MockV2Registry(MockRegistry):
         MANIFEST_DIGEST: MockResponse(202, data={}),
     }
 
+    def call(self, response_map, url, data=None, headers=None):
+        assert url.startswith(REGISTRY_URL)
+        request = format_url(url[len(REGISTRY_URL) :])
+        try:
+            return response_map[request]
+        except KeyError:
+            return MockResponse(code=404, text="Not found: %s" % request)
+
+    def get(self, *args, **kwargs):
+        return self.call(self.GET_MAP, *args, **kwargs)
+
+    def delete(self, *args, **kwargs):
+        return self.call(self.DELETE_MAP, *args, **kwargs)
+
 
 def mock_registry():
-    v2_registry = MockV2Registry()
-    flexmock(_BaseClient, get=v2_registry.get, delete=v2_registry.delete)
+    registry = MockRegistry()
+    flexmock(_BaseClient, get=registry.get, delete=registry.delete)
     return REGISTRY_URL
