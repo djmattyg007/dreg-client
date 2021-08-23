@@ -1,3 +1,4 @@
+import dataclasses
 import json
 import logging
 
@@ -53,11 +54,11 @@ class CommonBaseClient(object):
         return response.json()
 
 
-class _Manifest(object):
-    def __init__(self, content, type, digest):
-        self._content = content
-        self._type = type
-        self._digest = digest
+@dataclasses.dataclass(frozen=True)
+class _Manifest:
+    content: dict
+    content_type: str
+    digest: str
 
 
 BASE_CONTENT_TYPE = "application/vnd.docker.distribution.manifest"
@@ -97,7 +98,7 @@ class BaseClientV2(CommonBaseClient):
 
     def get_digest_and_manifest(self, name, reference):
         m = self.get_manifest(name, reference)
-        return m._digest, m._content
+        return m.digest, m.content
 
     def get_manifest(self, name, reference):
         self.auth.desired_scope = "repository:%s:*" % name
@@ -111,7 +112,7 @@ class BaseClientV2(CommonBaseClient):
         self._cache_manifest_digest(name, reference, response=response)
         return _Manifest(
             content=response.json(),
-            type=response.headers.get("Content-Type", "application/json"),
+            content_type=response.headers.get("Content-Type", "application/json"),
             digest=self._manifest_digests[name, reference],
         )
 
