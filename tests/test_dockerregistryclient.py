@@ -1,7 +1,7 @@
 import pytest
 
 from dreg_client import DockerRegistryClient
-from dreg_client.Repository import BaseRepository
+from dreg_client.Repository import Repository
 
 from .drc_test_utils.mock_registry import (
     TEST_NAME,
@@ -30,7 +30,7 @@ class TestDockerRegistryClient(object):
         url = mock_registry()
         client = DockerRegistryClient(url)
         repository = client.repository(repository, namespace=namespace)
-        assert isinstance(repository, BaseRepository)
+        assert isinstance(repository, Repository)
 
     def test_repository_namespace_incorrect(self):
         url = mock_registry()
