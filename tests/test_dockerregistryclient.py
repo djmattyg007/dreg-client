@@ -1,7 +1,7 @@
 import pytest
 
 from dreg_client import DockerRegistryClient
-from dreg_client.Repository import Repository
+from dreg_client.repository import Repository
 
 from .drc_test_utils.mock_registry import (
     TEST_NAME,

@@ -4,7 +4,7 @@ import logging
 
 from requests import delete, get
 
-from .AuthorizationService import AuthorizationService
+from .auth_service import AuthorizationService
 
 
 logger = logging.getLogger(__name__)

@@ -1,5 +1,5 @@
 from ._BaseClient import BaseClient
-from .Repository import Repository
+from .repository import Repository
 
 
 class DockerRegistryClient:
