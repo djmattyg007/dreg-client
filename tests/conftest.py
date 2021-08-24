@@ -26,9 +26,9 @@ def wait_till_up(url: str, attempts: int) -> None:
 @pytest.fixture
 def registry(docker_client: DockerClient):
     cli = docker_client
-    cli.images.pull("registry", "2")
+    cli.images.pull("registry", "2.7")
     container: Container = cli.containers.create(
-        "registry:2",
+        "registry:2.7",
         ports={
             5000: 5000,
         },

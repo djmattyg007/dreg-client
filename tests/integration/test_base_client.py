@@ -13,7 +13,8 @@ def test_base_client(registry):
 
 def test_base_client_edit_manifest(docker_client, registry):
     cli = BaseClient("http://localhost:5000")
-    image, _ = docker_client.images.build(
+
+    docker_client.images.build(
         path=str(FIXTURES_DIR / "base"),
         tag="localhost:5000/x-drc-example:x-drc-test",
     )
