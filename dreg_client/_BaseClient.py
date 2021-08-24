@@ -1,10 +1,10 @@
-import dataclasses
 import json
 import logging
 
 from requests import delete, get
 
 from .auth_service import AuthorizationService
+from .manifest import Manifest
 
 
 logger = logging.getLogger(__name__)
@@ -53,13 +53,6 @@ class CommonBaseClient:
         return response.json()
 
 
-@dataclasses.dataclass(frozen=True)
-class _Manifest:
-    content: dict
-    content_type: str
-    digest: str
-
-
 BASE_CONTENT_TYPE = "application/vnd.docker.distribution.manifest"
 
 
@@ -98,7 +91,7 @@ class BaseClientV2(CommonBaseClient):
         m = self.get_manifest(name, reference)
         return m.digest, m.content
 
-    def get_manifest(self, name, reference) -> _Manifest:
+    def get_manifest(self, name, reference) -> Manifest:
         self.auth.desired_scope = "repository:%s:*" % name
         response = self._http_response(
             self.MANIFEST,
@@ -107,7 +100,7 @@ class BaseClientV2(CommonBaseClient):
             reference=reference,
             schema=self.schema_1_signed,
         )
-        return _Manifest(
+        return Manifest(
             content=response.json(),
             content_type=response.headers.get("Content-Type", "application/json"),
             digest=response.headers.get("Docker-Content-Digest"),
