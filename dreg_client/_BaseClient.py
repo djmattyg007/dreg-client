@@ -2,10 +2,9 @@ import dataclasses
 import json
 import logging
 
-from requests import delete, get, put
+from requests import delete, get
 
 from .AuthorizationService import AuthorizationService
-from .manifest import sign as sign_manifest
 
 
 logger = logging.getLogger(__name__)
@@ -114,22 +113,6 @@ class BaseClientV2(CommonBaseClient):
             content=response.json(),
             content_type=response.headers.get("Content-Type", "application/json"),
             digest=self._manifest_digests[name, reference],
-        )
-
-    def put_manifest(self, name, reference, manifest):
-        self.auth.desired_scope = "repository:%s:*" % name
-        content = {}
-        content.update(manifest.content)
-        content.update({"name": name, "tag": reference})
-
-        return self._http_call(
-            self.MANIFEST,
-            put,
-            data=sign_manifest(content),
-            content_type=self.schema_1_signed,
-            schema=self.schema_1_signed,
-            name=name,
-            reference=reference,
         )
 
     def delete_manifest(self, name, digest):

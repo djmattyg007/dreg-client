@@ -27,8 +27,6 @@ def test_base_client_edit_manifest(docker_client, registry):
     assert manifest.content["name"] == "x-drc-example"
     assert manifest.content["tag"] == "x-drc-test"
 
-    cli.put_manifest("x-drc-example", "x-drc-test-put", manifest)
-
     pull = docker_client.api.images.pull(
         "localhost:5000/x-drc-example",
         "x-drc-test-put",
