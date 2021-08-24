@@ -36,3 +36,8 @@ class Repository:
 
     def __repr__(self):
         return "Repository({name})".format(name=self.name)
+
+
+__all__ = (
+    "Repository",
+)

@@ -66,3 +66,8 @@ class AuthorizationService:
         # We managed to get a new token, update the current scope to the one we
         # wanted
         self.scope = self.desired_scope
+
+
+__all__ = (
+    "AuthorizationService",
+)
