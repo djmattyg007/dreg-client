@@ -1,6 +1,9 @@
-import pkg_resources
+from pathlib import Path
 
 from dreg_client import BaseClient
+
+
+FIXTURES_DIR = Path(__file__).parent / "fixtures"
 
 
 def test_base_client(registry):
@@ -10,30 +13,23 @@ def test_base_client(registry):
 
 def test_base_client_edit_manifest(docker_client, registry):
     cli = BaseClient("http://localhost:5000")
-    build = docker_client.build(
-        pkg_resources.resource_filename(__name__, "fixtures/base"),
-        "localhost:5000/x-drc-example:x-drc-test",
-        stream=True,
-    )
-    for line in build:
-        print(line)
-
-    push = docker_client.push(
-        "localhost:5000/x-drc-example",
-        "x-drc-test",
-        stream=True,
+    image, _ = docker_client.images.build(
+        path=str(FIXTURES_DIR / "base"),
+        tag="localhost:5000/x-drc-example:x-drc-test",
     )
 
-    for line in push:
-        print(line)
+    docker_client.images.push(
+        repository="localhost:5000/x-drc-example",
+        tag="x-drc-test",
+    )
 
-    m = cli.get_manifest("x-drc-example", "x-drc-test")
-    assert m._content["name"] == "x-drc-example"
-    assert m._content["tag"] == "x-drc-test"
+    manifest = cli.get_manifest("x-drc-example", "x-drc-test")
+    assert manifest.content["name"] == "x-drc-example"
+    assert manifest.content["tag"] == "x-drc-test"
 
-    cli.put_manifest("x-drc-example", "x-drc-test-put", m)
+    cli.put_manifest("x-drc-example", "x-drc-test-put", manifest)
 
-    pull = docker_client.pull(
+    pull = docker_client.api.images.pull(
         "localhost:5000/x-drc-example",
         "x-drc-test-put",
         stream=True,

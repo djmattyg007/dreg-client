@@ -100,7 +100,7 @@ class BaseClientV2(CommonBaseClient):
         m = self.get_manifest(name, reference)
         return m.digest, m.content
 
-    def get_manifest(self, name, reference):
+    def get_manifest(self, name, reference) -> _Manifest:
         self.auth.desired_scope = "repository:%s:*" % name
         response = self._http_response(
             self.MANIFEST,
@@ -119,7 +119,7 @@ class BaseClientV2(CommonBaseClient):
     def put_manifest(self, name, reference, manifest):
         self.auth.desired_scope = "repository:%s:*" % name
         content = {}
-        content.update(manifest._content)
+        content.update(manifest.content)
         content.update({"name": name, "tag": reference})
 
         return self._http_call(
