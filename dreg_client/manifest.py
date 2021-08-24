@@ -8,6 +8,4 @@ class Manifest:
     digest: str
 
 
-__all__ = (
-    "Manifest",
-)
+__all__ = ("Manifest",)

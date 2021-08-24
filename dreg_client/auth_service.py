@@ -68,6 +68,4 @@ class AuthorizationService:
         self.scope = self.desired_scope
 
 
-__all__ = (
-    "AuthorizationService",
-)
+__all__ = ("AuthorizationService",)

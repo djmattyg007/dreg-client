@@ -38,6 +38,4 @@ class Repository:
         return "Repository({name})".format(name=self.name)
 
 
-__all__ = (
-    "Repository",
-)
+__all__ = ("Repository",)
