@@ -23,7 +23,7 @@ import requests
 from dreg_client import DockerRegistryClient
 
 
-class CLI(object):
+class CLI:
     def __init__(self):
         self.parser = argparse.ArgumentParser()
         excl_group = self.parser.add_mutually_exclusive_group()

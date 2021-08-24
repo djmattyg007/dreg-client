@@ -10,7 +10,7 @@ from .AuthorizationService import AuthorizationService
 logger = logging.getLogger(__name__)
 
 
-class CommonBaseClient(object):
+class CommonBaseClient:
     def __init__(self, host, verify_ssl=None, username=None, password=None, api_timeout=None):
         self.host = host
 

@@ -7,7 +7,7 @@ import requests
 logger = logging.getLogger(__name__)
 
 
-class AuthorizationService(object):
+class AuthorizationService:
     """This class implements a Authorization Service for Docker registry v2.
 
     Specification can be found here :
