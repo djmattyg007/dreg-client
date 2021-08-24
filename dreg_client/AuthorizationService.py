@@ -60,6 +60,7 @@ class AuthorizationService(object):
         if not rsp.ok:
             logger.error("Can't get token for authentication")
             self.token = ""
+            return
 
         self.token = rsp.json()["token"]
         # We managed to get a new token, update the current scope to the one we
