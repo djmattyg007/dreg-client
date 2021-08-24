@@ -77,7 +77,7 @@ class BaseClientV2(CommonBaseClient):
         self.auth = AuthorizationService(
             registry=self.host,
             url=auth_service_url,
-            verify=self.method_kwargs.get("verify", False),
+            verify=self.method_kwargs.get("verify", True),
             auth=self.method_kwargs.get("auth", None),
             api_timeout=self.method_kwargs.get("api_timeout"),
         )

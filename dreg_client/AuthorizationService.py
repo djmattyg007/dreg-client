@@ -17,7 +17,7 @@ class AuthorizationService(object):
     authenticate to the registry. Token has to be renew each time we change "scope".
     """
 
-    def __init__(self, registry, url="", auth=None, verify=False, api_timeout=None):
+    def __init__(self, registry, url="", auth=None, verify=True, api_timeout=None):
         # Registry ip:port
         self.registry = urlsplit(registry).netloc
         # Service url, ip:port
@@ -35,7 +35,7 @@ class AuthorizationService(object):
         self.scope = ""
         # Token used to authenticate
         self.token = ""
-        # Boolean to enfore https checks. Used by request
+        # Boolean to enfore https checks. Used by requests
         self.verify = verify
 
         # If we have no url then token are not required. get_new_token will not
