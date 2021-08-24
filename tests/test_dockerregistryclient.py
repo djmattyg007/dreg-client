@@ -1,3 +1,5 @@
+import re
+
 import pytest
 
 from dreg_client import DockerRegistryClient
@@ -35,7 +37,9 @@ class TestDockerRegistryClient(object):
     def test_repository_namespace_incorrect(self):
         url = mock_registry()
         client = DockerRegistryClient(url)
-        with pytest.raises(RuntimeError):
+
+        errmsg = "^" + re.escape("Cannot specify namespace twice.") + "$"
+        with pytest.raises(RuntimeError, match=errmsg):
             client.repository("{0}/{1}".format(TEST_NAMESPACE, TEST_REPO), namespace=TEST_NAMESPACE)
 
     @pytest.mark.parametrize("namespace", (TEST_NAMESPACE, None))
