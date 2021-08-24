@@ -28,15 +28,15 @@ def test_base_client_edit_manifest(docker_client, registry):
     assert manifest.content["name"] == "x-drc-example"
     assert manifest.content["tag"] == "x-drc-test"
 
-    pull = docker_client.api.images.pull(
-        "localhost:5000/x-drc-example",
-        "x-drc-test-put",
+    pull = docker_client.api.pull(
+        repository="localhost:5000/x-drc-example",
+        tag="x-drc-test",
         stream=True,
         decode=True,
     )
 
     pull = list(pull)
-    tag = "localhost:5000/x-drc-example:x-drc-test-put"
+    tag = "localhost:5000/x-drc-example:x-drc-test"
 
     expected_statuses = {
         "Status: Downloaded newer image for " + tag,
