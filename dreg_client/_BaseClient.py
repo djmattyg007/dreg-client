@@ -73,8 +73,7 @@ class BaseClientV2(CommonBaseClient):
 
     def __init__(self, *args, **kwargs):
         auth_service_url = kwargs.pop("auth_service_url", "")
-        super(BaseClientV2, self).__init__(*args, **kwargs)
-        self._manifest_digests = {}
+        super().__init__(*args, **kwargs)
         self.auth = AuthorizationService(
             registry=self.host,
             url=auth_service_url,
@@ -108,11 +107,10 @@ class BaseClientV2(CommonBaseClient):
             reference=reference,
             schema=self.schema_1_signed,
         )
-        self._cache_manifest_digest(name, reference, response=response)
         return _Manifest(
             content=response.json(),
             content_type=response.headers.get("Content-Type", "application/json"),
-            digest=self._manifest_digests[name, reference],
+            digest=response.headers.get("Docker-Content-Digest"),
         )
 
     def delete_manifest(self, name, digest):
@@ -122,14 +120,6 @@ class BaseClientV2(CommonBaseClient):
     def delete_blob(self, name, digest):
         self.auth.desired_scope = "repository:%s:*" % name
         return self._http_call(self.BLOB, delete, name=name, digest=digest)
-
-    def _cache_manifest_digest(self, name, reference, response=None):
-        if not response:
-            # TODO: create our own digest
-            raise NotImplementedError()
-
-        untrusted_digest = response.headers.get("Docker-Content-Digest")
-        self._manifest_digests[(name, reference)] = untrusted_digest
 
     def _http_response(self, url, method, data=None, content_type=None, schema=None, **kwargs):
         """url -> full target url
