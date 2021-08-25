@@ -57,9 +57,6 @@ BASE_CONTENT_TYPE = "application/vnd.docker.distribution.manifest"
 
 
 class BaseClientV2(CommonBaseClient):
-    LIST_TAGS = "/v2/{name}/tags/list"
-    MANIFEST = "/v2/{name}/manifests/{reference}"
-    BLOB = "/v2/{name}/blobs/{digest}"
     schema_1_signed = BASE_CONTENT_TYPE + ".v1+prettyjws"
     schema_1 = BASE_CONTENT_TYPE + ".v1+json"
     schema_2 = BASE_CONTENT_TYPE + ".v2+json"
@@ -85,7 +82,7 @@ class BaseClientV2(CommonBaseClient):
 
     def get_repository_tags(self, name):
         self.auth.desired_scope = "repository:%s:*" % name
-        return self._http_call(self.LIST_TAGS, get, name=name)
+        return self._http_call("/v2/{name}/tags/list", get, name=name)
 
     def get_digest_and_manifest(self, name, reference):
         m = self.get_manifest(name, reference)
@@ -94,7 +91,7 @@ class BaseClientV2(CommonBaseClient):
     def get_manifest(self, name, reference) -> Manifest:
         self.auth.desired_scope = "repository:%s:*" % name
         response = self._http_response(
-            self.MANIFEST,
+            "/v2/{name}/manifests/{reference}",
             get,
             name=name,
             reference=reference,
@@ -108,11 +105,11 @@ class BaseClientV2(CommonBaseClient):
 
     def delete_manifest(self, name, digest):
         self.auth.desired_scope = "repository:%s:*" % name
-        return self._http_call(self.MANIFEST, delete, name=name, reference=digest)
+        return self._http_call("/v2/{name}/manifests/{reference}", delete, name=name, reference=digest)
 
     def delete_blob(self, name, digest):
         self.auth.desired_scope = "repository:%s:*" % name
-        return self._http_call(self.BLOB, delete, name=name, digest=digest)
+        return self._http_call("/v2/{name}/blobs/{digest}", delete, name=name, digest=digest)
 
     def _http_response(self, url, method, data=None, content_type=None, schema=None, **kwargs):
         """url -> full target url
