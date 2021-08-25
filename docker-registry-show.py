@@ -5,7 +5,7 @@ Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
 You may obtain a copy of the License at
 
-    http://www.apache.org/licenses/LICENSE-2.0
+    https://www.apache.org/licenses/LICENSE-2.0
 
 Unless required by applicable law or agreed to in writing, software
 distributed under the License is distributed on an "AS IS" BASIS,
@@ -17,10 +17,11 @@ limitations under the License.
 import argparse
 import json
 import logging
+import sys
 
 import requests
 
-from dreg_client import DockerRegistryClient
+from dreg_client import Registry
 
 
 class CLI:
@@ -68,7 +69,7 @@ class CLI:
             "password": args.password,
         }
 
-        client = DockerRegistryClient(
+        client = Registry(
             args.registry[0],
             auth_service_url=args.authorization_service,
             verify_ssl=args.verify_ssl,
@@ -83,12 +84,12 @@ class CLI:
         else:
             self.show_repositories(client)
 
-    def show_repositories(self, client):
+    def show_repositories(self, client: Registry):
         try:
             repositories = client.repositories()
         except requests.HTTPError as e:
             if e.response.status_code == requests.codes.not_found:
-                print("Catalog/Search not supported")
+                print("Catalog/Search not supported", file=sys.stderr)
             else:
                 raise
         else:
@@ -101,7 +102,7 @@ class CLI:
             repo = client.repository(repository)
         except requests.HTTPError as e:
             if e.response.status_code == requests.codes.not_found:
-                print("Repository {0} not found".format(repository))
+                print("Repository {0} not found".format(repository), file=sys.stderr)
             else:
                 raise
         else:
@@ -114,7 +115,7 @@ class CLI:
             repo = client.repository(repository)
         except requests.HTTPError as e:
             if e.response.status_code == requests.codes.not_found:
-                print("Repository {0} not found".format(repository))
+                print("Repository {0} not found".format(repository), file=sys.stderr)
             else:
                 raise
         else:
