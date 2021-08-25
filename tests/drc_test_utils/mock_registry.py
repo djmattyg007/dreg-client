@@ -25,7 +25,7 @@ def format_url(s):
     )
 
 
-class MockResponse(object):
+class MockResponse:
     def __init__(self, code, data=None, text=None, headers=None):
         self.ok = 200 <= code < 400
         self.status_code = code
@@ -51,7 +51,7 @@ class MockResponse(object):
         return self.data
 
 
-class MockRegistry(object):
+class MockRegistry:
     TAGS = format_url("/v2/{name}/tags/list")
     TAGS_LIBRARY = format_url("/v2/{repo}/tags/list")
     MANIFEST_TAG = format_url("/v2/{name}/manifests/{tag}")

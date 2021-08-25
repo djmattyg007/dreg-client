@@ -35,7 +35,7 @@ class AuthorizationService:
         self.scope = ""
         # Token used to authenticate
         self.token = ""
-        # Boolean to enfore https checks. Used by requests
+        # Boolean to enforce https checks. Used by requests
         self.verify = verify
 
         # If we have no url then token are not required. get_new_token will not

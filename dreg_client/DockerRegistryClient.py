@@ -13,8 +13,6 @@ class DockerRegistryClient:
         api_timeout=None,
     ):
         """
-        Constructor
-
         :param host: str, registry URL including scheme
         :param verify_ssl: bool, whether to verify SSL certificate
         :param username: username to use for basic authentication when
