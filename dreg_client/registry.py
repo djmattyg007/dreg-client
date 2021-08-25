@@ -73,3 +73,6 @@ class Registry:
             self._repositories_by_namespace.setdefault(ns, {})
             self._repositories_by_namespace[ns][name] = r
             self._repositories[name] = r
+
+
+__all__ = ("Registry",)

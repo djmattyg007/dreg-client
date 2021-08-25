@@ -142,3 +142,6 @@ class Client:
             return {}
 
         return response.json()
+
+
+__all__ = ("Client",)

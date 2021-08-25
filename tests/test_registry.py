@@ -14,7 +14,7 @@ from .drc_test_utils.mock_registry import (
 )
 
 
-class TestDockerRegistryClient(object):
+class TestDockerRegistryClient:
     def test_namespaces(self):
         url = mock_registry()
         client = Registry(url)
