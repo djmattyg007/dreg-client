@@ -10,66 +10,44 @@ from .manifest import Manifest
 logger = logging.getLogger(__name__)
 
 
-class CommonBaseClient:
-    def __init__(self, host, verify_ssl=None, username=None, password=None, api_timeout=None):
+BASE_CONTENT_TYPE = "application/vnd.docker.distribution.manifest"
+
+schema_1_signed = BASE_CONTENT_TYPE + ".v1+prettyjws"
+schema_1 = BASE_CONTENT_TYPE + ".v1+json"
+schema_2 = BASE_CONTENT_TYPE + ".v2+json"
+
+
+class BaseClient:
+    def __init__(
+        self,
+        host,
+        verify_ssl=None,
+        username=None,
+        password=None,
+        api_timeout=None,
+        auth_service_url="",
+    ):
         self.host = host
+
+        if username is not None and password is not None:
+            auth = (username, password)
+        else:
+            auth = None
 
         self.method_kwargs = {}
         if verify_ssl is not None:
             self.method_kwargs["verify"] = verify_ssl
-        if username is not None and password is not None:
-            self.method_kwargs["auth"] = (username, password)
+        if auth:
+            self.method_kwargs["auth"] = auth
         if api_timeout is not None:
             self.method_kwargs["timeout"] = api_timeout
 
-    def _http_response(self, url, method, data=None, **kwargs):
-        """url -> full target url
-        method -> method from requests
-        data -> request body
-        kwargs -> url formatting args
-        """
-        header = {"content-type": "application/json"}
-
-        if data:
-            data = json.dumps(data)
-        path = url.format(**kwargs)
-        logger.debug("%s %s", method.__name__.upper(), path)
-        response = method(self.host + path, data=data, headers=header, **self.method_kwargs)
-        logger.debug("%s %s", response.status_code, response.reason)
-        response.raise_for_status()
-
-        return response
-
-    def _http_call(self, url, method, data=None, **kwargs):
-        """url -> full target url
-        method -> method from requests
-        data -> request body
-        kwargs -> url formatting args
-        """
-        response = self._http_response(url, method, data=data, **kwargs)
-        if not response.content:
-            return {}
-
-        return response.json()
-
-
-BASE_CONTENT_TYPE = "application/vnd.docker.distribution.manifest"
-
-
-class BaseClientV2(CommonBaseClient):
-    schema_1_signed = BASE_CONTENT_TYPE + ".v1+prettyjws"
-    schema_1 = BASE_CONTENT_TYPE + ".v1+json"
-    schema_2 = BASE_CONTENT_TYPE + ".v2+json"
-
-    def __init__(self, *args, **kwargs):
-        auth_service_url = kwargs.pop("auth_service_url", "")
-        super().__init__(*args, **kwargs)
         self.auth = AuthorizationService(
-            registry=self.host,
+            registry=host,
             url=auth_service_url,
-            verify=self.method_kwargs.get("verify", True),
-            auth=self.method_kwargs.get("auth", None),
-            api_timeout=self.method_kwargs.get("api_timeout"),
+            verify=verify_ssl,
+            auth=auth,
+            api_timeout=api_timeout,
         )
 
     def check_status(self):
@@ -95,7 +73,7 @@ class BaseClientV2(CommonBaseClient):
             get,
             name=name,
             reference=reference,
-            schema=self.schema_1_signed,
+            schema=schema_1_signed,
         )
         return Manifest(
             content=response.json(),
@@ -105,7 +83,9 @@ class BaseClientV2(CommonBaseClient):
 
     def delete_manifest(self, name, digest):
         self.auth.desired_scope = "repository:%s:*" % name
-        return self._http_call("/v2/{name}/manifests/{reference}", delete, name=name, reference=digest)
+        return self._http_call(
+            "/v2/{name}/manifests/{reference}", delete, name=name, reference=digest
+        )
 
     def delete_blob(self, name, digest):
         self.auth.desired_scope = "repository:%s:*" % name
@@ -115,14 +95,14 @@ class BaseClientV2(CommonBaseClient):
         """url -> full target url
         method -> method from requests
         data -> request body
-        kwargs -> url formatting args
+        kwargs -> URL formatting args
         """
 
         if schema is None:
-            schema = self.schema_2
+            schema = schema_2
 
         header = {
-            "content-type": content_type or "application/json",
+            "Content-Type": content_type or "application/json",
             "Accept": schema,
         }
 
@@ -151,15 +131,14 @@ class BaseClientV2(CommonBaseClient):
 
         return response
 
+    def _http_call(self, url, method, data=None, **kwargs):
+        """url -> full target url
+        method -> method from requests
+        data -> request body
+        kwargs -> url formatting args
+        """
+        response = self._http_response(url, method, data=data, **kwargs)
+        if not response.content:
+            return {}
 
-def BaseClient(
-    host, verify_ssl=None, username=None, password=None, auth_service_url="", api_timeout=None
-):
-    return BaseClientV2(
-        host,
-        verify_ssl=verify_ssl,
-        username=username,
-        password=password,
-        auth_service_url=auth_service_url,
-        api_timeout=api_timeout,
-    )
+        return response.json()
