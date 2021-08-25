@@ -4,7 +4,7 @@ from flexmock import flexmock
 from requests.exceptions import HTTPError
 from requests.models import Response
 
-from dreg_client import _BaseClient
+from dreg_client import client
 
 
 REGISTRY_URL = "https://registry.example.com:5000"
@@ -92,5 +92,5 @@ class MockRegistry(object):
 
 def mock_registry():
     registry = MockRegistry()
-    flexmock(_BaseClient, get=registry.get, delete=registry.delete)
+    flexmock(client, get=registry.get, delete=registry.delete)
     return REGISTRY_URL

@@ -17,7 +17,7 @@ schema_1 = BASE_CONTENT_TYPE + ".v1+json"
 schema_2 = BASE_CONTENT_TYPE + ".v2+json"
 
 
-class BaseClient:
+class Client:
     def __init__(
         self,
         host,

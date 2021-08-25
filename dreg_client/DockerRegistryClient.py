@@ -1,4 +1,4 @@
-from ._BaseClient import BaseClient
+from .client import Client
 from .repository import Repository
 
 
@@ -24,7 +24,7 @@ class DockerRegistryClient:
         :param api_timeout: timeout for external request
         """
 
-        self._base_client = BaseClient(
+        self._base_client = Client(
             host,
             verify_ssl=verify_ssl,
             username=username,

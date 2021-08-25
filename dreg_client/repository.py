@@ -1,9 +1,11 @@
 from typing import Optional
 
+from .client import Client
+
 
 class Repository:
-    def __init__(self, client, repository: str, namespace: Optional[str] = None):
-        self._client = client
+    def __init__(self, client: Client, repository: str, namespace: Optional[str] = None):
+        self._client: Client = client
         self.repository: str = repository
         self.namespace: Optional[str] = namespace
 

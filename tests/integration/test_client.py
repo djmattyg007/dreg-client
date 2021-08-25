@@ -1,18 +1,18 @@
 from pathlib import Path
 
-from dreg_client import BaseClient
+from dreg_client import Client
 
 
 FIXTURES_DIR = Path(__file__).parent / "fixtures"
 
 
 def test_base_client(registry):
-    cli = BaseClient("http://localhost:5000")
+    cli = Client("http://localhost:5000")
     assert cli.catalog() == {"repositories": []}
 
 
 def test_base_client_edit_manifest(docker_client, registry):
-    cli = BaseClient("http://localhost:5000")
+    cli = Client("http://localhost:5000")
 
     docker_client.images.build(
         path=str(FIXTURES_DIR / "base"),
