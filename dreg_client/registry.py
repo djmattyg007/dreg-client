@@ -2,7 +2,7 @@ from .client import Client
 from .repository import Repository
 
 
-class DockerRegistryClient:
+class Registry:
     def __init__(
         self,
         host,

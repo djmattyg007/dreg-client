@@ -2,7 +2,7 @@ import re
 
 import pytest
 
-from dreg_client import DockerRegistryClient
+from dreg_client.registry import Registry
 from dreg_client.repository import Repository
 
 from .drc_test_utils.mock_registry import (
@@ -17,7 +17,7 @@ from .drc_test_utils.mock_registry import (
 class TestDockerRegistryClient(object):
     def test_namespaces(self):
         url = mock_registry()
-        client = DockerRegistryClient(url)
+        client = Registry(url)
         assert client.namespaces() == [TEST_NAMESPACE]
 
     @pytest.mark.parametrize(
@@ -30,13 +30,13 @@ class TestDockerRegistryClient(object):
     )
     def test_repository(self, repository, namespace):
         url = mock_registry()
-        client = DockerRegistryClient(url)
+        client = Registry(url)
         repository = client.repository(repository, namespace=namespace)
         assert isinstance(repository, Repository)
 
     def test_repository_namespace_incorrect(self):
         url = mock_registry()
-        client = DockerRegistryClient(url)
+        client = Registry(url)
 
         errmsg = "^" + re.escape("Cannot specify namespace twice.") + "$"
         with pytest.raises(RuntimeError, match=errmsg):
@@ -45,7 +45,7 @@ class TestDockerRegistryClient(object):
     @pytest.mark.parametrize("namespace", (TEST_NAMESPACE, None))
     def test_repositories(self, namespace):
         url = mock_registry()
-        client = DockerRegistryClient(url)
+        client = Registry(url)
         repositories = client.repositories(TEST_NAMESPACE)
         assert len(repositories) == 1
         assert TEST_NAME in repositories
@@ -54,7 +54,7 @@ class TestDockerRegistryClient(object):
 
     def test_repository_tags(self):
         url = mock_registry()
-        client = DockerRegistryClient(url)
+        client = Registry(url)
         repositories = client.repositories(TEST_NAMESPACE)
         assert TEST_NAME in repositories
         repository = repositories[TEST_NAME]
@@ -64,7 +64,7 @@ class TestDockerRegistryClient(object):
 
     def test_repository_manifest(self):
         url = mock_registry()
-        client = DockerRegistryClient(url)
+        client = Registry(url)
         repository = client.repositories()[TEST_NAME]
         digest, manifest = repository.manifest(TEST_TAG)
         repository.delete_manifest(digest)

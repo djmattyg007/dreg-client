@@ -1,14 +1,14 @@
 from .auth_service import AuthorizationService
 from .client import Client
-from .DockerRegistryClient import DockerRegistryClient
 from .manifest import Manifest
+from .registry import Registry
 from .repository import Repository
 
 
 __all__ = (
     "AuthorizationService",
     "Client",
-    "DockerRegistryClient",
     "Manifest",
+    "Registry",
     "Repository",
 )
