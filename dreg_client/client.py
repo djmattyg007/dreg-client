@@ -2,7 +2,7 @@ import json
 import logging
 from typing import Optional, Tuple
 
-from requests import delete, get
+from requests import RequestException, delete, get
 
 from .auth_service import AuthorizationService
 from .manifest import Manifest
@@ -52,9 +52,14 @@ class Client:
             api_timeout=api_timeout,
         )
 
-    def check_status(self):
+    def check_status(self) -> bool:
         self.auth.desired_scope = "registry:catalog:*"
-        return self._http_call("/v2/", get)
+        try:
+            self._http_call("/v2/", get)
+        except (ValueError, RequestException):
+            return False
+        else:
+            return True
 
     def catalog(self):
         self.auth.desired_scope = "registry:catalog:*"

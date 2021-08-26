@@ -5,7 +5,7 @@ from .drc_test_utils.mock_registry import TEST_NAME, TEST_TAG, mock_registry
 
 def test_check_status():
     url = mock_registry()
-    Client(url).check_status()
+    assert Client(url).check_status() is True
 
 
 def test_get_manifest_and_digest():
