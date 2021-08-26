@@ -1,10 +1,11 @@
 ## Code Style
 
-Follow pep8 and check style with pyflakes
+Code style is checked by running ``inv lint``. You can reformat all of the code automatically with
+``inv reformat``. This should ensure your code passes the style-related linting checks for CI.
 
 ## Testing
 
-Tests are run with `pytest tests`. Please write tests for new code.
+Tests are run with ``inv test``. Please write tests for new code.
 
 ## CI
 
