@@ -13,7 +13,7 @@ class Repository:
         self._tags = None
 
     @property
-    def name(self):
+    def name(self) -> str:
         if self.namespace:
             return f"{self.namespace}/{self.repository}"
         return self.repository
@@ -30,10 +30,10 @@ class Repository:
         """
         return self._client.get_manifest(self.name, reference)
 
-    def delete_manifest(self, digest):
+    def delete_manifest(self, digest: str):
         return self._client.delete_manifest(self.name, digest)
 
-    def refresh(self):
+    def refresh(self) -> None:
         response = self._client.get_repository_tags(self.name)
         self._tags = response["tags"]
 

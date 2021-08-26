@@ -1,5 +1,6 @@
 import json
 import logging
+from typing import Optional, Tuple
 
 from requests import delete, get
 
@@ -20,15 +21,16 @@ schema_2 = BASE_CONTENT_TYPE + ".v2+json"
 class Client:
     def __init__(
         self,
-        host,
-        verify_ssl=None,
-        username=None,
-        password=None,
-        api_timeout=None,
-        auth_service_url="",
+        host: str,
+        verify_ssl: Optional[bool] = None,
+        username: Optional[str] = None,
+        password: Optional[str] = None,
+        api_timeout: Optional[int] = None,
+        auth_service_url: str = "",
     ):
         self.host = host
 
+        auth: Optional[Tuple[str, str]]
         if username is not None and password is not None:
             auth = (username, password)
         else:
@@ -58,7 +60,7 @@ class Client:
         self.auth.desired_scope = "registry:catalog:*"
         return self._http_call("/v2/_catalog", get)
 
-    def get_repository_tags(self, name):
+    def get_repository_tags(self, name: str):
         self.auth.desired_scope = "repository:%s:*" % name
         return self._http_call("/v2/{name}/tags/list", get, name=name)
 
@@ -77,7 +79,7 @@ class Client:
             digest=response.headers.get("Docker-Content-Digest"),
         )
 
-    def delete_manifest(self, name, digest):
+    def delete_manifest(self, name: str, digest: str):
         self.auth.desired_scope = "repository:%s:*" % name
         return self._http_call(
             "/v2/{name}/manifests/{reference}", delete, name=name, reference=digest

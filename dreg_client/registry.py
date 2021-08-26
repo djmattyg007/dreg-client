@@ -1,3 +1,5 @@
+from typing import Optional
+
 from .client import Client
 from .repository import Repository
 
@@ -39,7 +41,7 @@ class Registry:
 
         return list(self._repositories_by_namespace.keys())
 
-    def repository(self, repository, namespace=None):
+    def repository(self, repository: str, namespace: Optional[str] = None) -> Repository:
         if "/" in repository:
             if namespace is not None:
                 raise RuntimeError("Cannot specify namespace twice.")
@@ -56,7 +58,7 @@ class Registry:
 
         return self._repositories
 
-    def refresh(self):
+    def refresh(self) -> None:
         repositories = self._base_client.catalog()["repositories"]
         for name in repositories:
             try:
