@@ -10,5 +10,6 @@ def test_check_status():
 
 def test_get_manifest_and_digest():
     url = mock_registry()
-    # TODO: Assert what the digest and manifest are
-    digest, manifest = Client(url).get_digest_and_manifest(TEST_NAME, TEST_TAG)
+    manifest = Client(url).get_manifest(TEST_NAME, TEST_TAG)
+    assert manifest.digest == "sha256:6c3c624b58dbbcd3c0dd82b4c53f04194d1247c6eebdaab7c610cf7d66709b3b"
+    assert isinstance(manifest.content, dict)

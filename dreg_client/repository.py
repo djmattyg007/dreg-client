@@ -1,6 +1,7 @@
 from typing import Optional
 
 from .client import Client
+from .manifest import Manifest
 
 
 class Repository:
@@ -23,11 +24,11 @@ class Repository:
 
         return self._tags
 
-    def manifest(self, tag):
+    def manifest(self, reference: str) -> Manifest:
         """
-        Return a tuple, (digest, manifest), for a given tag
+        Return a manifest for a given reference (a tag or a digest)
         """
-        return self._client.get_digest_and_manifest(self.name, tag)
+        return self._client.get_manifest(self.name, reference)
 
     def delete_manifest(self, digest):
         return self._client.delete_manifest(self.name, digest)

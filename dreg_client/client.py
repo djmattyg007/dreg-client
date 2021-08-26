@@ -62,11 +62,7 @@ class Client:
         self.auth.desired_scope = "repository:%s:*" % name
         return self._http_call("/v2/{name}/tags/list", get, name=name)
 
-    def get_digest_and_manifest(self, name, reference):
-        m = self.get_manifest(name, reference)
-        return m.digest, m.content
-
-    def get_manifest(self, name, reference) -> Manifest:
+    def get_manifest(self, name: str, reference: str) -> Manifest:
         self.auth.desired_scope = "repository:%s:*" % name
         response = self._http_response(
             "/v2/{name}/manifests/{reference}",
