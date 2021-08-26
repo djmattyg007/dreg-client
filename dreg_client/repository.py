@@ -15,7 +15,7 @@ class Repository:
     @property
     def name(self):
         if self.namespace:
-            return "{self.namespace}/{self.repository}".format(self=self)
+            return f"{self.namespace}/{self.repository}"
         return self.repository
 
     def tags(self):
