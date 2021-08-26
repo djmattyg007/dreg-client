@@ -17,7 +17,7 @@ from .drc_test_utils.mock_registry import (
 class TestDockerRegistryClient:
     def test_namespaces(self):
         url = mock_registry()
-        client = Registry(url)
+        client = Registry.build_with_client(url)
         assert client.namespaces() == [TEST_NAMESPACE]
 
     @pytest.mark.parametrize(
@@ -30,13 +30,13 @@ class TestDockerRegistryClient:
     )
     def test_repository(self, repository, namespace):
         url = mock_registry()
-        client = Registry(url)
+        client = Registry.build_with_client(url)
         repository = client.repository(repository, namespace=namespace)
         assert isinstance(repository, Repository)
 
     def test_repository_namespace_incorrect(self):
         url = mock_registry()
-        client = Registry(url)
+        client = Registry.build_with_client(url)
 
         errmsg = "^" + re.escape("Cannot specify namespace twice.") + "$"
         with pytest.raises(RuntimeError, match=errmsg):
@@ -45,7 +45,7 @@ class TestDockerRegistryClient:
     @pytest.mark.parametrize("namespace", (TEST_NAMESPACE, None))
     def test_repositories(self, namespace):
         url = mock_registry()
-        client = Registry(url)
+        client = Registry.build_with_client(url)
         repositories = client.repositories(TEST_NAMESPACE)
         assert len(repositories) == 1
         assert TEST_NAME in repositories
@@ -54,7 +54,7 @@ class TestDockerRegistryClient:
 
     def test_repository_tags(self):
         url = mock_registry()
-        client = Registry(url)
+        client = Registry.build_with_client(url)
         repositories = client.repositories(TEST_NAMESPACE)
         assert TEST_NAME in repositories
         repository = repositories[TEST_NAME]
@@ -64,7 +64,7 @@ class TestDockerRegistryClient:
 
     def test_repository_manifest(self):
         url = mock_registry()
-        client = Registry(url)
+        client = Registry.build_with_client(url)
         repository = client.repositories()[TEST_NAME]
         manifest = repository.manifest(TEST_TAG)
         repository.delete_manifest(manifest.digest)

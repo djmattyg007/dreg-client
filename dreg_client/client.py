@@ -28,6 +28,16 @@ class Client:
         api_timeout: Optional[int] = None,
         auth_service_url: str = "",
     ):
+        """
+        :param host: str, registry URL including scheme
+        :param verify_ssl: bool, whether to verify SSL certificate
+        :param username: username to use for basic authentication when
+          connecting to the registry
+        :param password: password to use for basic authentication
+        :param auth_service_url: authorization service URL (including scheme)
+        :param api_timeout: timeout for external request
+        """
+
         self.host = host
 
         auth: Optional[Tuple[str, str]]
