@@ -2,7 +2,7 @@ import json
 import logging
 from typing import Optional, Tuple
 
-from requests import RequestException, delete, get
+from requests import RequestException, Response, delete, get
 
 from .auth_service import AuthorizationService
 from .manifest import Manifest
@@ -89,9 +89,9 @@ class Client:
             schema=schema_1_signed,
         )
         return Manifest(
-            content=response.json(),
-            content_type=response.headers.get("Content-Type", "application/json"),
             digest=response.headers.get("Docker-Content-Digest"),
+            content_type=response.headers.get("Content-Type", "application/json"),
+            content=response.json(),
         )
 
     def delete_manifest(self, name: str, digest: str):
@@ -104,7 +104,7 @@ class Client:
         self.auth.desired_scope = "repository:%s:*" % name
         return self._http_call("/v2/{name}/blobs/{digest}", delete, name=name, digest=digest)
 
-    def _http_response(self, url, method, data=None, content_type=None, schema=None, **kwargs):
+    def _http_response(self, url, method, data=None, schema=None, **kwargs) -> Response:
         """url -> full target url
         method -> method from requests
         data -> request body
@@ -115,8 +115,8 @@ class Client:
             schema = schema_2
 
         header = {
-            "Content-Type": content_type or "application/json",
             "Accept": schema,
+            "Content-Type": "application/json",
         }
 
         # Token specific part. We add the token in the header if necessary
@@ -133,12 +133,9 @@ class Client:
 
             header["Authorization"] = "Bearer %s" % self.auth.token
 
-        if data and not content_type:
-            data = json.dumps(data)
-
         path = url.format(**kwargs)
         logger.debug("%s %s", method.__name__.upper(), path)
-        response = method(self.host + path, data=data, headers=header, **self.method_kwargs)
+        response = method(self.host + path, json=data, headers=header, **self.method_kwargs)
         logger.debug("%s %s", response.status_code, response.reason)
         response.raise_for_status()
 

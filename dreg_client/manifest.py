@@ -3,9 +3,9 @@ import dataclasses
 
 @dataclasses.dataclass(frozen=True)
 class Manifest:
-    content: dict
-    content_type: str
     digest: str
+    content_type: str
+    content: dict = dataclasses.field(compare=False)
 
 
 __all__ = ("Manifest",)

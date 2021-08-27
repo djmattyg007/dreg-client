@@ -8,7 +8,7 @@ from dreg_client import client
 
 
 REGISTRY_URL = "https://registry.example.com:5000"
-TEST_NAMESPACE = "library"
+TEST_NAMESPACE = "mynamespace"
 TEST_REPO = "myrepo"
 TEST_NAME = "%s/%s" % (TEST_NAMESPACE, TEST_REPO)
 TEST_TAG = "latest"
@@ -59,7 +59,7 @@ class MockRegistry:
 
     GET_MAP = {
         "/v2/": MockResponse(200),
-        "/v2/_catalog": MockResponse(200, data={"repositories": [TEST_NAME]}),
+        "/v2/_catalog": MockResponse(200, data={"repositories": [TEST_NAME, "otherrepo"]}),
         TAGS: MockResponse(200, data={"name": TEST_NAME, "tags": [TEST_TAG]}),
         TAGS_LIBRARY: MockResponse(200, data={"name": TEST_NAME, "tags": [TEST_TAG]}),
         MANIFEST_TAG: MockResponse(
@@ -75,7 +75,7 @@ class MockRegistry:
         MANIFEST_DIGEST: MockResponse(202, data={}),
     }
 
-    def call(self, response_map, url, data=None, headers=None):
+    def call(self, response_map, url, json=None, headers=None):
         assert url.startswith(REGISTRY_URL)
         request = format_url(url[len(REGISTRY_URL) :])
         try:

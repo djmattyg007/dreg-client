@@ -38,7 +38,7 @@ class Repository:
         self._tags = response["tags"]
 
     def __repr__(self):
-        return "Repository({name})".format(name=self.name)
+        return f"Repository({self.name})"
 
 
 __all__ = ("Repository",)
