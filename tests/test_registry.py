@@ -62,7 +62,7 @@ def test_retrieve_all_repositories():
 
     repositories = registry.repositories()
     assert len(repositories) == 2
-    assert sorted(tuple(repositories.keys())) == ["mynamespace/myrepo", "otherrepo"]
+    assert sorted(repositories.keys()) == ["mynamespace/myrepo", "otherrepo"]
 
     repository = repositories[TEST_NAME]
     assert repository.name == f"{TEST_NAMESPACE}/{TEST_REPO}"
