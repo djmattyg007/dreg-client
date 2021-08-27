@@ -5,10 +5,7 @@ from .repository import Repository
 
 
 class Registry:
-    def __init__(
-        self,
-        client: Client,
-    ):
+    def __init__(self, client: Client):
         self._client = client
         self._repositories = {}
         self._repositories_by_namespace = {}
