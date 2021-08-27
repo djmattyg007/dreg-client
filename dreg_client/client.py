@@ -1,5 +1,5 @@
 import logging
-from typing import Optional, Tuple
+from typing import Optional, Sequence, Tuple, TypedDict
 
 from requests import RequestException, Response, delete, get
 
@@ -15,6 +15,15 @@ BASE_CONTENT_TYPE = "application/vnd.docker.distribution.manifest"
 schema_1_signed = BASE_CONTENT_TYPE + ".v1+prettyjws"
 schema_1 = BASE_CONTENT_TYPE + ".v1+json"
 schema_2 = BASE_CONTENT_TYPE + ".v2+json"
+
+
+class CatalogResponse(TypedDict):
+    repositories: Sequence[str]
+
+
+class TagsResponse(TypedDict):
+    name: str
+    tags: Optional[Sequence[str]]
 
 
 class Client:
@@ -70,11 +79,11 @@ class Client:
         else:
             return True
 
-    def catalog(self):
+    def catalog(self) -> CatalogResponse:
         self.auth.desired_scope = "registry:catalog:*"
         return self._http_call("/v2/_catalog", get)
 
-    def get_repository_tags(self, name: str):
+    def get_repository_tags(self, name: str) -> TagsResponse:
         self.auth.desired_scope = "repository:%s:*" % name
         return self._http_call("/v2/{name}/tags/list", get, name=name)
 
