@@ -4,8 +4,6 @@ import responses
 
 from dreg_client.client import Client
 
-from .drc_test_utils.mock_registry import TEST_NAME, TEST_TAG, mock_registry
-
 
 def test_check_status_success():
     with responses.RequestsMock() as rsps:
@@ -54,7 +52,7 @@ def test_catalog_failure():
         rsps.add(rsps.GET, "https://registry.example.com:5000/v2/_catalog", body="{'abc'}")
 
         client = Client.build_with_session("https://registry.example.com:5000/v2/")
-        with pytest.raises(ValueError):
+        with pytest.raises(ValueError):  # noqa: PT011
             client.catalog()
 
 
@@ -93,7 +91,7 @@ def test_get_repository_tags_failure():
         )
 
         client = Client.build_with_session("https://registry.example.com:5000/v2/")
-        with pytest.raises(ValueError):
+        with pytest.raises(ValueError):  # noqa: PT011
             client.get_repository_tags("testns/testrepo")
 
 
@@ -163,7 +161,7 @@ def test_get_manifest_failure():
         )
 
         client = Client.build_with_session("https://registry.example.com:5000/v2/")
-        with pytest.raises(ValueError):
+        with pytest.raises(ValueError):  # noqa: PT011
             client.get_manifest("testns/testrepo", "abcdef")
 
 
@@ -253,7 +251,7 @@ def test_get_blob_failure():
             "testns/testrepo",
             "sha256:1a067abcdef121044c411ad73ac82cecd098762dabe7bc4d4b6dbbd55963b667",
         )
-        with pytest.raises(ValueError):
+        with pytest.raises(ValueError):  # noqa: PT011
             response.json()
 
 

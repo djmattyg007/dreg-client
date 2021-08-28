@@ -8,6 +8,7 @@ recursive-exclude * __pycache__
 recursive-exclude * *.py[co]
 
 include pytest.ini
+recursive-include tests *.json
 recursive-include tests *.py
 recursive-include tests *.txt
 include tests/integration/fixtures/base/Dockerfile

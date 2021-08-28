@@ -33,7 +33,7 @@ class AuthToken:
         return time.time() > self.expires_at
 
 
-class AuthServiceFailure(Exception):
+class AuthServiceFailure(Exception):  # noqa: N818
     pass
 
 
