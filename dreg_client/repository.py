@@ -1,9 +1,13 @@
 from __future__ import annotations
 
-from typing import Optional
+from typing import TYPE_CHECKING, Optional
 
 from .client import Client
 from .manifest import Manifest
+
+
+if TYPE_CHECKING:
+    from requests import Response
 
 
 class Repository:
@@ -26,19 +30,19 @@ class Repository:
 
         return self._tags
 
-    def manifest(self, reference: str) -> Manifest:
+    def get_manifest(self, reference: str) -> Manifest:
         """
         Return a manifest for a given reference (a tag or a digest)
         """
         return self._client.get_manifest(self.name, reference)
 
-    def delete_manifest(self, digest: str):
+    def delete_manifest(self, digest: str) -> Response:
         return self._client.delete_manifest(self.name, digest)
 
-    def get_blob(self, digest: str):
+    def get_blob(self, digest: str) -> Response:
         return self._client.get_blob(self.name, digest)
 
-    def delete_blob(self, digest: str):
+    def delete_blob(self, digest: str) -> Response:
         return self._client.delete_blob(self.name, digest)
 
     def refresh(self) -> None:

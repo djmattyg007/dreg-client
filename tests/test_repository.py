@@ -1,22 +1,134 @@
-from dreg_client.client import Client
+from unittest.mock import Mock
+
+import pytest
+
+from dreg_client.manifest import Manifest
 from dreg_client.repository import Repository
 
-from .drc_test_utils.mock_registry import TEST_NAMESPACE, TEST_REPO, mock_registry
+
+@pytest.fixture
+def tags_client():
+    client = Mock()
+    client.get_repository_tags.return_value = {
+        "name": "testns/testrepo",
+        "tags": ["2019", "2020", "2021"],
+    }
+    return client
+
+
+@pytest.fixture
+def manifest_client(manifest_v1):
+    client = Mock()
+    client.get_manifest.return_value = Manifest(
+        digest="sha256:fc7187188888f5192efdc08682d7fa260820a41f2bdd09b7f5f9cdcb53c9fbc0",
+        content_type="application/vnd.docker.distribution.manifest.v1+json",
+        content=manifest_v1,
+    )
+    return client
 
 
 def test_name_with_namespace():
-    url = mock_registry()
-    repo = Repository(Client(url), TEST_REPO, TEST_NAMESPACE)
-    assert repo.name == "mynamespace/myrepo"
+    repo = Repository(Mock(), "testrepo", "testns")
+    assert repo.name == "testns/testrepo"
 
 
 def test_name_without_namespace():
-    url = mock_registry()
-    repo = Repository(Client(url), TEST_REPO)
-    assert repo.name == "myrepo"
+    repo = Repository(Mock(), "testrepo", None)
+    assert repo.name == "testrepo"
 
 
-def test_repr():
-    url = mock_registry()
-    repo = Repository(Client(url), TEST_REPO, TEST_NAMESPACE)
-    assert repr(repo) == "Repository(mynamespace/myrepo)"
+def test_tags(tags_client):
+    repo = Repository(tags_client, "testrepo", "testns")
+    tags = repo.tags()
+    assert tags == ["2019", "2020", "2021"]
+
+
+def test_tags_refreshes_once(tags_client):
+    repo = Repository(tags_client, "testrepo", "testns")
+    for _ in range(5):
+        repo.tags()
+        tags_client.get_repository_tags.assert_called_once_with("testns/testrepo")
+
+
+def test_get_manifest_by_tag(manifest_client):
+    repo = Repository(manifest_client, "testrepo", "testns")
+    manifest = repo.get_manifest("2021")
+    assert (
+        manifest.digest == "sha256:fc7187188888f5192efdc08682d7fa260820a41f2bdd09b7f5f9cdcb53c9fbc0"
+    )
+    manifest_client.get_manifest.assert_called_once_with("testns/testrepo", "2021")
+
+
+def test_get_manifest_by_digest(manifest_client):
+    repo = Repository(manifest_client, "testrepo", "testns")
+    manifest = repo.get_manifest(
+        "sha256:fc7187188888f5192efdc08682d7fa260820a41f2bdd09b7f5f9cdcb53c9fbc0"
+    )
+    assert (
+        manifest.digest == "sha256:fc7187188888f5192efdc08682d7fa260820a41f2bdd09b7f5f9cdcb53c9fbc0"
+    )
+    manifest_client.get_manifest.assert_called_once_with(
+        "testns/testrepo", "sha256:fc7187188888f5192efdc08682d7fa260820a41f2bdd09b7f5f9cdcb53c9fbc0"
+    )
+
+
+def test_delete_manifest():
+    client = Mock()
+    repo = Repository(client, "testrepo")
+    repo.delete_manifest("sha256:4ef2dcae68b6a303c47800a752a324c24558c5b79b90cc5dc976cefcef11804b")
+    client.delete_manifest.assert_called_once_with(
+        "testrepo", "sha256:4ef2dcae68b6a303c47800a752a324c24558c5b79b90cc5dc976cefcef11804b"
+    )
+
+
+def test_get_blob():
+    client = Mock()
+    repo = Repository(client, "testrepo")
+    repo.get_blob("sha256:ec53626738d81855711ed61cdf96b139eb3d35ec34c21e01b7d2ca5386be8462")
+    client.get_blob.assert_called_once_with(
+        "testrepo", "sha256:ec53626738d81855711ed61cdf96b139eb3d35ec34c21e01b7d2ca5386be8462"
+    )
+
+
+def test_delete_blob():
+    client = Mock()
+    repo = Repository(client, "testrepo", "testns")
+    repo.delete_blob("sha256:5622e1b34662c8a1136e250aa433274c47808c38625918a219a586fd39c59047")
+    client.delete_blob.assert_called_once_with(
+        "testns/testrepo", "sha256:5622e1b34662c8a1136e250aa433274c47808c38625918a219a586fd39c59047"
+    )
+
+
+def test_manual_refresh(tags_client):
+    repo = Repository(tags_client, "testrepo", "testns")
+    repo.refresh()
+    tags_client.get_repository_tags.assert_called_once_with("testns/testrepo")
+
+    tags_client.get_repository_tags.reset_mock()
+    repo.refresh()
+    tags_client.get_repository_tags.assert_called_once_with("testns/testrepo")
+
+
+def test_manual_refresh_after_tag_retrieval(tags_client):
+    repo = Repository(tags_client, "testrepo")
+    for _ in range(5):
+        repo.tags()
+    tags_client.get_repository_tags.assert_called_once_with("testrepo")
+
+    tags_client.get_repository_tags.reset_mock()
+    repo.refresh()
+    tags_client.get_repository_tags.assert_called_once_with("testrepo")
+
+    tags_client.get_repository_tags.reset_mock()
+    repo.tags()
+    tags_client.get_repository_tags.assert_not_called()
+
+
+def test_repr_with_namespace():
+    repo = Repository(Mock(), "testrepo", "testns")
+    assert repr(repo) == "Repository(testns/testrepo)"
+
+
+def test_repr_without_namespace():
+    repo = Repository(Mock(), "testrepo")
+    assert repr(repo) == "Repository(testrepo)"
