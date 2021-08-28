@@ -81,10 +81,14 @@ class CLI:
 
         auth_service: Optional[AuthService] = None
         if args.auth_token_url and args.auth_service:
-            auth_service = DockerTokenAuthService.build_with_session(args.auth_token_url, args.auth_service, auth=basic_auth)
+            auth_service = DockerTokenAuthService.build_with_session(
+                args.auth_token_url, args.auth_service, auth=basic_auth
+            )
             basic_auth = None
 
-        registry = Registry.build_with_manual_client(args.registry, auth=basic_auth, auth_service=auth_service)
+        registry = Registry.build_with_manual_client(
+            args.registry, auth=basic_auth, auth_service=auth_service
+        )
 
         if args.repository:
             if args.ref:

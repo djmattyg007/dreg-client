@@ -8,8 +8,10 @@ from requests_toolbelt.sessions import BaseUrlSession
 
 from .manifest import Manifest
 
+
 if TYPE_CHECKING:
     from requests import Response
+
     from ._types import RequestsAuth
     from .auth_service import AuthService
 
@@ -39,7 +41,9 @@ class TagsResponse(TypedDict):
 
 
 class Client:
-    def __init__(self, session: BaseUrlSession, *, auth_service: Optional[AuthService] = None) -> None:
+    def __init__(
+        self, session: BaseUrlSession, *, auth_service: Optional[AuthService] = None
+    ) -> None:
         if session.auth and auth_service:
             raise ValueError("Cannot supply session.auth and auth_service together.")
 
@@ -47,7 +51,9 @@ class Client:
         self._auth_service = auth_service
 
     @classmethod
-    def build_with_session(cls, base_url: str, *, auth: RequestsAuth = None, auth_service: Optional[AuthService] = None) -> Client:
+    def build_with_session(
+        cls, base_url: str, *, auth: RequestsAuth = None, auth_service: Optional[AuthService] = None
+    ) -> Client:
         if auth and auth_service:
             raise ValueError("Cannot supply auth and auth_service together.")
 

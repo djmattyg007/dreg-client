@@ -7,8 +7,10 @@ from typing import TYPE_CHECKING, Protocol, runtime_checkable
 
 from requests_toolbelt.sessions import BaseUrlSession
 
+
 if TYPE_CHECKING:
     from typing import Dict
+
     from ._types import RequestsAuth
 
 
@@ -47,7 +49,9 @@ class DockerTokenAuthService(AuthService):
         self._saved_tokens: Dict[str, AuthToken] = {}
 
     @classmethod
-    def build_with_session(cls, base_url: str, service: str, auth: RequestsAuth = None) -> AuthService:
+    def build_with_session(
+        cls, base_url: str, service: str, auth: RequestsAuth = None
+    ) -> AuthService:
         session = BaseUrlSession(base_url)
         session.params["service"] = service
         session.auth = auth

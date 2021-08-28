@@ -5,8 +5,10 @@ from typing import TYPE_CHECKING, Optional
 from .client import Client
 from .repository import Repository
 
+
 if TYPE_CHECKING:
     from requests_toolbelt.sessions import BaseUrlSession
+
     from ._types import RequestsAuth
     from .auth_service import AuthService
 
@@ -24,15 +26,13 @@ class Registry:
         *,
         auth_service: Optional[AuthService] = None,
     ) -> Registry:
-        return cls(
-            Client(session, auth_service=auth_service)
-        )
+        return cls(Client(session, auth_service=auth_service))
 
     @classmethod
-    def build_with_manual_client(cls, base_url: str, *, auth: RequestsAuth = None, auth_service: Optional[AuthService] = None) -> Registry:
-        return cls(
-            Client.build_with_session(base_url, auth=auth, auth_service=auth_service)
-        )
+    def build_with_manual_client(
+        cls, base_url: str, *, auth: RequestsAuth = None, auth_service: Optional[AuthService] = None
+    ) -> Registry:
+        return cls(Client.build_with_session(base_url, auth=auth, auth_service=auth_service))
 
     def namespaces(self):
         if not self._repositories:
