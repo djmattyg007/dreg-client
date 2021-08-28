@@ -7,12 +7,12 @@ FIXTURES_DIR = Path(__file__).parent / "fixtures"
 
 
 def test_base_client(registry):
-    cli = Client.build_with_session("http://localhost:5000/v2/")
-    assert cli.catalog() == {"repositories": []}
+    client = Client.build_with_session("http://localhost:5000/v2/")
+    assert client.catalog() == {"repositories": []}
 
 
 def test_base_client_edit_manifest(docker_client, registry):
-    cli = Client.build_with_session("http://localhost:5000/v2/")
+    client = Client.build_with_session("http://localhost:5000/v2/")
 
     docker_client.images.build(
         path=str(FIXTURES_DIR / "base"),
@@ -24,7 +24,7 @@ def test_base_client_edit_manifest(docker_client, registry):
         tag="x-drc-test",
     )
 
-    manifest = cli.get_manifest("x-drc-example", "x-drc-test")
+    manifest = client.get_manifest("x-drc-example", "x-drc-test")
     assert manifest.content["name"] == "x-drc-example"
     assert manifest.content["tag"] == "x-drc-test"
 
