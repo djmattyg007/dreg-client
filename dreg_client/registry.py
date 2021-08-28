@@ -43,7 +43,7 @@ class Registry:
     def repository(self, repository: str, namespace: Optional[str] = None) -> Repository:
         if "/" in repository:
             if namespace is not None:
-                raise RuntimeError("Cannot specify namespace twice.")
+                raise ValueError("Cannot specify namespace twice.")
             namespace, repository = repository.split("/", 1)
 
         return Repository(self._client, repository, namespace=namespace)
