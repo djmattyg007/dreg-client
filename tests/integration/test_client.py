@@ -24,6 +24,10 @@ def test_base_client_edit_manifest(docker_client, registry):
         tag="x-drc-test",
     )
 
+    tags_response = client.get_repository_tags("x-drc-example")
+    assert tags_response["name"] == "x-drc-example"
+    assert sorted(tags_response["tags"]) == ["x-drc-test"]
+
     manifest = client.get_manifest("x-drc-example", "x-drc-test")
     assert manifest.content["name"] == "x-drc-example"
     assert manifest.content["tag"] == "x-drc-test"
