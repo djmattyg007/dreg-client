@@ -7,12 +7,12 @@ FIXTURES_DIR = Path(__file__).parent / "fixtures"
 
 
 def test_base_client(registry):
-    cli = Client("http://localhost:5000")
+    cli = Client.build_with_session("http://localhost:5000/v2/")
     assert cli.catalog() == {"repositories": []}
 
 
 def test_base_client_edit_manifest(docker_client, registry):
-    cli = Client("http://localhost:5000")
+    cli = Client.build_with_session("http://localhost:5000/v2/")
 
     docker_client.images.build(
         path=str(FIXTURES_DIR / "base"),
