@@ -16,31 +16,31 @@ def test_base_client_edit_manifest(docker_client, registry):
 
     docker_client.images.build(
         path=str(FIXTURES_DIR / "base"),
-        tag="localhost:5000/x-drc-example:x-drc-test",
+        tag="localhost:5000/x-dreg-example:x-dreg-test",
     )
 
     docker_client.images.push(
-        repository="localhost:5000/x-drc-example",
-        tag="x-drc-test",
+        repository="localhost:5000/x-dreg-example",
+        tag="x-dreg-test",
     )
 
-    tags_response = client.get_repository_tags("x-drc-example")
-    assert tags_response["name"] == "x-drc-example"
-    assert sorted(tags_response["tags"]) == ["x-drc-test"]
+    tags_response = client.get_repository_tags("x-dreg-example")
+    assert tags_response["name"] == "x-dreg-example"
+    assert sorted(tags_response["tags"]) == ["x-dreg-test"]
 
-    manifest = client.get_manifest("x-drc-example", "x-drc-test")
-    assert manifest.content["name"] == "x-drc-example"
-    assert manifest.content["tag"] == "x-drc-test"
+    manifest = client.get_manifest("x-dreg-example", "x-dreg-test")
+    assert manifest.content["name"] == "x-dreg-example"
+    assert manifest.content["tag"] == "x-dreg-test"
 
     pull = docker_client.api.pull(
-        repository="localhost:5000/x-drc-example",
-        tag="x-drc-test",
+        repository="localhost:5000/x-dreg-example",
+        tag="x-dreg-test",
         stream=True,
         decode=True,
     )
 
     pull = list(pull)
-    tag = "localhost:5000/x-drc-example:x-drc-test"
+    tag = "localhost:5000/x-dreg-example:x-dreg-test"
 
     expected_statuses = {
         "Status: Downloaded newer image for " + tag,
