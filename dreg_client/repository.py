@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Optional
+from typing import TYPE_CHECKING, Optional, Sequence
 
 from .client import Client
 from .manifest import Manifest
@@ -24,7 +24,7 @@ class Repository:
             return f"{self.namespace}/{self.repository}"
         return self.repository
 
-    def tags(self):
+    def tags(self) -> Sequence[str]:
         if self._tags is None:
             self.refresh()
 
@@ -47,7 +47,7 @@ class Repository:
 
     def refresh(self) -> None:
         response = self._client.get_repository_tags(self.name)
-        self._tags = response["tags"]
+        self._tags = tuple(response["tags"])
 
     def __repr__(self):
         return f"Repository({self.name})"

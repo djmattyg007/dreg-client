@@ -40,7 +40,7 @@ def test_name_without_namespace():
 def test_tags(tags_client):
     repo = Repository(tags_client, "testrepo", "testns")
     tags = repo.tags()
-    assert tags == ["2019", "2020", "2021"]
+    assert sorted(tags) == ["2019", "2020", "2021"]
 
 
 def test_tags_refreshes_once(tags_client):
