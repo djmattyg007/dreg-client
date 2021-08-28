@@ -35,6 +35,12 @@ class Repository:
     def delete_manifest(self, digest: str):
         return self._client.delete_manifest(self.name, digest)
 
+    def get_blob(self, digest: str):
+        return self._client.get_blob(self.name, digest)
+
+    def delete_blob(self, digest: str):
+        return self._client.delete_blob(self.name, digest)
+
     def refresh(self) -> None:
         response = self._client.get_repository_tags(self.name)
         self._tags = response["tags"]
