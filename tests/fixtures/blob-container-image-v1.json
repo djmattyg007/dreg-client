@@ -1,0 +1,27 @@
+{
+  "architecture": "amd64",
+  "config": {
+    "Env": [
+      "PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
+    ],
+    "Cmd": [
+      "bash"
+    ],
+    "OnBuild": null
+  },
+  "created": "2021-08-28T01:35:59.758616391Z",
+  "history": [
+    {
+      "created": "2021-08-17T01:23:26.106744652Z",
+      "created_by": "/bin/sh -c #(nop) ADD file:a528c112b566e7f129178dadedfa421b0c5b870997c4628327967850e54b915c in / "
+    }
+  ],
+  "os": "linux",
+  "rootfs": {
+    "type": "layers",
+    "diff_ids": [
+      "sha256:a881cfa23a7842d844818a1cb4d8460a7396b94fdc0bc4091f8d79b8f4f81c3e",
+      "sha256:6e8eefec161469ac125ee2aa4ac2d779a5145af650bf26242f11d93e2d032c16"
+    ]
+  }
+}

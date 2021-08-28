@@ -1,10 +1,35 @@
+import json
+from pathlib import Path
 import time
+from typing import Any, Dict
 
 import pytest
 import requests
 from docker import DockerClient, from_env
 from docker.models.containers import Container
 from requests import exceptions
+
+
+@pytest.fixture(scope="session")
+def tests_dir() -> Path:
+    return Path(__file__).parent
+
+
+@pytest.fixture(scope="session")
+def fixtures_dir(tests_dir: Path) -> Path:
+    return tests_dir / "fixtures"
+
+
+@pytest.fixture
+def manifest_v1(fixtures_dir: Path) -> Dict[str, Any]:
+    fixture_file = fixtures_dir / "manifest-v1.json"
+    return json.loads(fixture_file.read_text(encoding="utf-8"))
+
+
+@pytest.fixture
+def blob_container_image_v1(fixtures_dir: Path) -> Dict[str, Any]:
+    fixture_file = fixtures_dir / "blob-container-image-v1.json"
+    return json.loads(fixture_file.read_text(encoding="utf-8"))
 
 
 @pytest.fixture(scope="session")

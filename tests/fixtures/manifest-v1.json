@@ -1,0 +1,32 @@
+{
+  "schemaVersion": 1,
+  "name": "testns/testrepo",
+  "tag": "2021",
+  "architecture": "amd64",
+  "fsLayers": [
+    {
+      "blobSum": "sha256:4c8ab3090c2685271afcffc2a4dc63f15ab11a0124bdbde6085c934a4e6f4c00"
+    }
+  ],
+  "history": [
+    {
+      "v1Compatibility": "{\"id\":\"7c8dc2651ca0ec64b13078a0cac5aff8acbeec304193f571533d1d528af04ffe\",\"created\":\"2021-08-17T01:23:26.106744652Z\",\"container_config\":{\"Cmd\":[\"/bin/sh -c #(nop) ADD file:a528c112b566e7f129178dadedfa421b0c5b870997c4628327967850e54b915c in / \"]}}"
+    }
+  ],
+  "signatures": [
+    {
+      "header": {
+        "jwk": {
+          "crv": "P-256",
+          "kid": "WIP6:VUYC:MZER:VCL3:VZ7B:SGZD:DHOD:C3ZN:I6WV:VVT7:VN7K:DQL7",
+          "kty": "EC",
+          "x": "SH4y-xy-abc",
+          "y": "Z23_ALD5mno"
+        },
+        "alg": "ES256"
+      },
+      "signature": "signature",
+      "protected": "protected"
+    }
+  ]
+}
