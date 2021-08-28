@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Optional
+from typing import TYPE_CHECKING, Mapping, Optional, Sequence
 
 from .client import Client
 from .repository import Repository
@@ -21,10 +21,7 @@ class Registry:
 
     @classmethod
     def build_with_client(
-        cls,
-        session: BaseUrlSession,
-        *,
-        auth_service: Optional[AuthService] = None,
+        cls, session: BaseUrlSession, *, auth_service: Optional[AuthService] = None
     ) -> Registry:
         return cls(Client(session, auth_service=auth_service))
 
@@ -34,11 +31,11 @@ class Registry:
     ) -> Registry:
         return cls(Client.build_with_session(base_url, auth=auth, auth_service=auth_service))
 
-    def namespaces(self):
+    def namespaces(self) -> Sequence[str]:
         if not self._repositories:
             self.refresh()
 
-        return list(self._repositories_by_namespace.keys())
+        return tuple(self._repositories_by_namespace.keys())
 
     def repository(self, repository: str, namespace: Optional[str] = None) -> Repository:
         if "/" in repository:
@@ -48,7 +45,7 @@ class Registry:
 
         return Repository(self._client, repository, namespace=namespace)
 
-    def repositories(self, namespace=None):
+    def repositories(self, namespace=None) -> Mapping[str, Repository]:
         if not self._repositories:
             self.refresh()
 
