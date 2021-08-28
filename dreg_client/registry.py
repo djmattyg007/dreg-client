@@ -1,11 +1,18 @@
-from typing import Optional
+from __future__ import annotations
+
+from typing import TYPE_CHECKING, Optional
 
 from .client import Client
 from .repository import Repository
 
+if TYPE_CHECKING:
+    from requests_toolbelt.sessions import BaseUrlSession
+    from ._types import RequestsAuth
+    from .auth_service import AuthService
+
 
 class Registry:
-    def __init__(self, client: Client):
+    def __init__(self, client: Client) -> None:
         self._client = client
         self._repositories = {}
         self._repositories_by_namespace = {}
@@ -13,22 +20,18 @@ class Registry:
     @classmethod
     def build_with_client(
         cls,
-        host: str,
-        verify_ssl: Optional[bool] = None,
-        username: Optional[str] = None,
-        password: Optional[str] = None,
-        api_timeout: Optional[int] = None,
-        auth_service_url: str = "",
-    ):
+        session: BaseUrlSession,
+        *,
+        auth_service: Optional[AuthService] = None,
+    ) -> Registry:
         return cls(
-            Client(
-                host=host,
-                verify_ssl=verify_ssl,
-                username=username,
-                password=password,
-                api_timeout=api_timeout,
-                auth_service_url=auth_service_url,
-            )
+            Client(session, auth_service=auth_service)
+        )
+
+    @classmethod
+    def build_with_manual_client(cls, base_url: str, *, auth: RequestsAuth = None, auth_service: Optional[AuthService] = None) -> Registry:
+        return cls(
+            Client.build_with_session(base_url, auth=auth, auth_service=auth_service)
         )
 
     def namespaces(self):

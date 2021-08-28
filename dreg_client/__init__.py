@@ -1,4 +1,6 @@
-from .auth_service import AuthorizationService
+from __future__ import annotations
+
+from .auth_service import AuthService, AuthServiceFailure, DockerTokenAuthService
 from .client import Client
 from .manifest import Manifest
 from .registry import Registry
@@ -6,8 +8,10 @@ from .repository import Repository
 
 
 __all__ = (
-    "AuthorizationService",
+    "AuthService",
+    "AuthServiceFailure",
     "Client",
+    "DockerTokenAuthService",
     "Manifest",
     "Registry",
     "Repository",

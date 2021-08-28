@@ -1,71 +1,90 @@
-import logging
-from urllib.parse import urlsplit
+from __future__ import annotations
 
-import requests
+import dataclasses
+import logging
+import time
+from typing import TYPE_CHECKING, Protocol, runtime_checkable
+
+from requests_toolbelt.sessions import BaseUrlSession
+
+if TYPE_CHECKING:
+    from typing import Dict
+    from ._types import RequestsAuth
 
 
 logger = logging.getLogger(__name__)
 
 
-class AuthorizationService:
-    """This class implements a Authorization Service for Docker registry v2.
+def make_expires_at(validity_duration: int) -> int:
+    expires_at = int(time.time()) + validity_duration - 5
+    return max(expires_at, 55)
 
-    Specification can be found here :
-    https://github.com/docker/distribution/blob/master/docs/spec/auth/token.md
 
-    The idea is to delegate authentication to a third party and use a token to
-    authenticate to the registry. Token has to be renew each time we change "scope".
-    """
+@dataclasses.dataclass(frozen=True, eq=False)
+class AuthToken:
+    token: str
+    validity_duration: int
+    expires_at: int
 
-    def __init__(self, registry, url="", auth=None, verify=True, api_timeout=None):
-        # Registry ip:port
-        self.registry = urlsplit(registry).netloc
-        # Service url, ip:port
-        self.url = url
-        # Authentication (user, password) or None. Used by request to do
-        # basicauth
-        self.auth = auth
-        # Timeout for HTTP request
-        self.api_timeout = api_timeout
+    @property
+    def has_expired(self) -> bool:
+        return time.time() > self.expires_at
 
-        # Desired scope is the scope needed for the next operation on the
-        # registry
-        self.desired_scope = ""
-        # Scope of the token we have
-        self.scope = ""
-        # Token used to authenticate
-        self.token = ""
-        # Boolean to enforce https checks. Used by requests
-        self.verify = verify
 
-        # If we have no url then token are not required. get_new_token will not
-        # be called
-        if url:
-            split = urlsplit(url)
-            # user in url will take precedence over giver username
-            if split.username and split.password:
-                self.auth = (split.username, split.password)
+class AuthServiceFailure(Exception):
+    pass
 
-            self.token_required = True
-        else:
-            self.token_required = False
 
-    def get_new_token(self):
-        rsp = requests.get(
-            "%s/v2/token?service=%s&scope=%s" % (self.url, self.registry, self.desired_scope),
-            auth=self.auth,
-            verify=self.verify,
-            timeout=self.api_timeout,
+@runtime_checkable
+class AuthService(Protocol):
+    def request_token(self, scope: str) -> str:
+        ...
+
+
+class DockerTokenAuthService(AuthService):
+    def __init__(self, session: BaseUrlSession):
+        self._session: BaseUrlSession = session
+        self._saved_tokens: Dict[str, AuthToken] = {}
+
+    @classmethod
+    def build_with_session(cls, base_url: str, service: str, auth: RequestsAuth = None) -> AuthService:
+        session = BaseUrlSession(base_url)
+        session.params["service"] = service
+        session.auth = auth
+        return DockerTokenAuthService(session)
+
+    def request_token(self, scope: str) -> str:
+        saved_token = self._saved_tokens.get(scope)
+        if saved_token:
+            if saved_token.has_expired:
+                self._saved_tokens.pop(scope, None)
+            else:
+                return saved_token.token
+
+        response = self._session.get("", params={"scope": scope})
+        try:
+            response.raise_for_status()
+        except Exception as exc:
+            raise AuthServiceFailure("Failed to retrieve valid auth token.") from exc
+
+        try:
+            data = response.json()
+        except ValueError as exc:
+            raise AuthServiceFailure("Failed to retrieve valid auth token.") from exc
+
+        token_value = data.get("token", data.get("access_token"))
+        if not token_value:
+            raise AuthServiceFailure("Failed to retrieve valid auth token.")
+
+        validity_duration = data.get("expires_in", 60)
+
+        token = AuthToken(
+            token=token_value,
+            validity_duration=validity_duration,
+            expires_at=make_expires_at(validity_duration),
         )
-        if not rsp.ok:
-            logger.error("Can't get token for authentication")
-            self.token = ""
-            return
-
-        self.token = rsp.json()["token"]
-        # We managed to get a new token, update the current scope to the one we
-        # wanted
-        self.scope = self.desired_scope
+        self._saved_tokens[scope] = token
+        return token.token
 
 
-__all__ = ("AuthorizationService",)
+__all__ = ("AuthService", "AuthServiceFailure", "DockerTokenAuthService")

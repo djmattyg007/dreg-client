@@ -18,10 +18,13 @@ import argparse
 import json
 import logging
 import sys
+from typing import Optional
 
 import requests
+from requests.auth import HTTPBasicAuth
 
-from dreg_client import Registry
+from dreg_client import AuthService, DockerTokenAuthService, Registry
+from dreg_client._types import RequestsAuth
 
 
 class CLI:
@@ -37,14 +40,22 @@ class CLI:
         self.parser.add_argument("--password", metavar="PASSWORD")
 
         self.parser.add_argument(
-            "--authorization-service",
+            "--auth-token-url",
+            dest="auth_token_url",
+            metavar="TOKEN_AUTH_URL",
+            type=str,
+            help="Authorisation token URL (including scheme)",
+        )
+        self.parser.add_argument(
+            "--auth-service",
+            dest="auth_service",
             metavar="AUTH_SERVICE",
             type=str,
-            help="authorization service URL (including scheme)",
+            help="Authorisation service",
         )
 
         self.parser.add_argument(
-            "registry", metavar="REGISTRY", nargs=1, help="registry URL (including scheme)"
+            "registry", metavar="REGISTRY_URL", help="registry URL (including scheme)"
         )
         self.parser.add_argument(
             "repository", metavar="REPOSITORY", nargs="?", help="repository (including namespace)"
@@ -64,65 +75,64 @@ class CLI:
 
         logging.basicConfig(**basic_config_args)
 
-        kwargs = {
-            "username": args.username,
-            "password": args.password,
-        }
+        basic_auth: RequestsAuth = None
+        if args.username and args.password:
+            basic_auth = HTTPBasicAuth(args.username, args.password)
 
-        client = Registry(
-            args.registry[0],
-            auth_service_url=args.authorization_service,
-            verify_ssl=args.verify_ssl,
-            **kwargs,
-        )
+        auth_service: Optional[AuthService] = None
+        if args.auth_token_url and args.auth_service:
+            auth_service = DockerTokenAuthService.build_with_session(args.auth_token_url, args.auth_service, auth=basic_auth)
+            basic_auth = None
+
+        registry = Registry.build_with_manual_client(args.registry, auth=basic_auth, auth_service=auth_service)
 
         if args.repository:
             if args.ref:
-                self.show_manifest(client, args.repository, args.ref)
+                self.show_manifest(registry, args.repository, args.ref)
             else:
-                self.show_tags(client, args.repository)
+                self.show_tags(registry, args.repository)
         else:
-            self.show_repositories(client)
+            self.show_repositories(registry)
 
-    def show_repositories(self, client: Registry):
+    def show_repositories(self, registry: Registry) -> None:
         try:
-            repositories = client.repositories()
+            repositories = registry.repositories()
         except requests.HTTPError as e:
-            if e.response.status_code == requests.codes.not_found:
-                print("Catalog/Search not supported", file=sys.stderr)
-            else:
+            if e.response.status_code != requests.codes.not_found:
                 raise
-        else:
-            print("Repositories:")
-            for repository in repositories.keys():
-                print("  - {0}".format(repository))
+            print("Catalog/Search not supported", file=sys.stderr)
+            return
 
-    def show_tags(self, client, repository):
-        try:
-            repo = client.repository(repository)
-        except requests.HTTPError as e:
-            if e.response.status_code == requests.codes.not_found:
-                print("Repository {0} not found".format(repository), file=sys.stderr)
-            else:
-                raise
-        else:
-            print("Tags in repository {0}:".format(repository))
-            for tag in repo.tags():
-                print("  - {0}".format(tag))
+        print("Repositories:")
+        for repository in repositories.keys():
+            print(f"  - {repository}")
 
-    def show_manifest(self, client, repository, ref):
+    def show_tags(self, registry: Registry, repository: str) -> None:
         try:
-            repo = client.repository(repository)
+            repo = registry.repository(repository)
         except requests.HTTPError as e:
-            if e.response.status_code == requests.codes.not_found:
-                print("Repository {0} not found".format(repository), file=sys.stderr)
-            else:
+            if e.response.status_code != requests.codes.not_found:
                 raise
-        else:
-            manifest, digest = repo.manifest(ref)
-            print("Digest: {0}".format(digest))
-            print("Manifest:")
-            print(json.dumps(manifest, indent=2, sort_keys=True))
+            print("Repository {0} not found".format(repository), file=sys.stderr)
+            return
+
+        print(f"Tags in repository {repository}:")
+        for tag in repo.tags():
+            print(f"  - {tag}")
+
+    def show_manifest(self, registry: Registry, repository: str, ref: str) -> None:
+        try:
+            repo = registry.repository(repository)
+        except requests.HTTPError as e:
+            if e.response.status_code != requests.codes.not_found:
+                raise
+            print("Repository {0} not found".format(repository), file=sys.stderr)
+            return
+
+        manifest = repo.manifest(ref)
+        print(f"Digest: {manifest.digest}")
+        print("Manifest:")
+        print(json.dumps(manifest, indent=2, sort_keys=True))
 
 
 if __name__ == "__main__":
