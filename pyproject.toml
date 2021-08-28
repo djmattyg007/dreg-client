@@ -13,6 +13,7 @@ include = [
     "dreg_client/*",
 ]
 omit = [
+    "dreg_client/_types.py",
     "tests/*",
     "setup.py",
     "tasks.py",
