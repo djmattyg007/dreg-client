@@ -4,7 +4,7 @@ from unittest.mock import Mock
 
 import pytest
 
-from dreg_client.manifest import Manifest
+from dreg_client.manifest import LegacyManifest
 from dreg_client.repository import Repository
 
 
@@ -22,7 +22,7 @@ def tags_client():
 def manifest_client(manifest_v1):
     client = Mock()
     client.check_manifest.return_value = "sha256:fc7187188888f5192efdc08682d7fa260820a41f2bdd09b7f5f9cdcb53c9fbc0"
-    client.get_manifest.return_value = Manifest(
+    client.get_manifest.return_value = LegacyManifest(
         digest="sha256:fc7187188888f5192efdc08682d7fa260820a41f2bdd09b7f5f9cdcb53c9fbc0",
         content_type="application/vnd.docker.distribution.manifest.v1+json",
         content=manifest_v1,
@@ -72,6 +72,7 @@ def test_check_manifest_by_digest(manifest_client):
 def test_get_manifest_by_tag(manifest_client):
     repo = Repository(manifest_client, "testrepo", "testns")
     manifest = repo.get_manifest("2021")
+    assert isinstance(manifest, LegacyManifest)
     assert (
         manifest.digest == "sha256:fc7187188888f5192efdc08682d7fa260820a41f2bdd09b7f5f9cdcb53c9fbc0"
     )
@@ -84,6 +85,7 @@ def test_get_manifest_by_digest(manifest_client):
     manifest = repo.get_manifest(
         "sha256:fc7187188888f5192efdc08682d7fa260820a41f2bdd09b7f5f9cdcb53c9fbc0"
     )
+    assert isinstance(manifest, LegacyManifest)
     assert (
         manifest.digest == "sha256:fc7187188888f5192efdc08682d7fa260820a41f2bdd09b7f5f9cdcb53c9fbc0"
     )

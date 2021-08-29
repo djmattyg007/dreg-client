@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from pathlib import Path
 
-from dreg_client import Client
+from dreg_client import Client, Manifest
 
 
 FIXTURES_DIR = Path(__file__).parent / "fixtures"
@@ -31,8 +31,14 @@ def test_client_manifest_interactions(docker_client, registry):
     assert sorted(tags_response["tags"]) == ["x-dreg-test"]
 
     manifest = client.get_manifest("x-dreg-example", "x-dreg-test")
-    assert manifest.content["name"] == "x-dreg-example"
-    assert manifest.content["tag"] == "x-dreg-test"
+    assert isinstance(manifest, Manifest)
+    assert manifest.content_type == "application/vnd.docker.distribution.manifest.v2+json"
+    assert manifest.config.content_type == "application/vnd.docker.container.image.v1+json"
+
+    config_response = client.get_blob("x-dreg-example", manifest.config.digest)
+    assert config_response.headers["Docker-Content-Digest"] == manifest.config.digest
+    config_data = config_response.json()
+    assert isinstance(config_data, dict)
 
     pull = docker_client.api.pull(
         repository="localhost:5000/x-dreg-example",
@@ -40,16 +46,15 @@ def test_client_manifest_interactions(docker_client, registry):
         stream=True,
         decode=True,
     )
+    pull_output = list(pull)
 
-    pull = list(pull)
     tag = "localhost:5000/x-dreg-example:x-dreg-test"
-
     expected_statuses = {
         "Status: Downloaded newer image for " + tag,
         "Status: Image is up to date for " + tag,
     }
 
-    errors = [evt for evt in pull if "error" in evt]
+    errors = [evt for evt in pull_output if "error" in evt]
     assert errors == []
 
-    assert {evt.get("status") for evt in pull} & expected_statuses
+    assert {evt.get("status") for evt in pull_output} & expected_statuses

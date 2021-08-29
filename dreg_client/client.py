@@ -1,12 +1,13 @@
 from __future__ import annotations
 
 import logging
-from typing import TYPE_CHECKING, Dict, Optional, Sequence, TypedDict
+from typing import TYPE_CHECKING, Dict, Optional, Sequence, TypedDict, Union
 
 from requests import HTTPError, RequestException
 from requests_toolbelt.sessions import BaseUrlSession
 
-from .manifest import Manifest
+from .manifest import ManifestParseOutput, parse_manifest_response
+from .schemas import schema_2, schema_2_list
 
 
 if TYPE_CHECKING:
@@ -20,12 +21,6 @@ logger = logging.getLogger(__name__)
 
 
 HEADERS = Dict[str, str]
-
-BASE_CONTENT_TYPE = "application/vnd.docker.distribution.manifest"
-
-schema_1_signed = BASE_CONTENT_TYPE + ".v1+prettyjws"
-schema_1 = BASE_CONTENT_TYPE + ".v1+json"
-schema_2 = BASE_CONTENT_TYPE + ".v2+json"
 
 scope_catalog = "registry:catalog:*"
 scope_repo = lambda repo: f"repository:{repo}:*"
@@ -117,7 +112,7 @@ class Client:
 
     def check_manifest(self, name: str, reference: str) -> Optional[str]:
         headers: HEADERS = {
-            "Accept": ",".join((schema_1_signed, schema_1)),
+            "Accept": ",".join((schema_2, schema_2_list)),
         }
         try:
             response = self._head(f"{name}/manifests/{reference}", scope_repo(name), headers=headers)
@@ -128,18 +123,13 @@ class Client:
 
         return response.headers.get("Docker-Content-Digest", None)
 
-    def get_manifest(self, name: str, reference: str) -> Manifest:
+    def get_manifest(self, name: str, reference: str) -> ManifestParseOutput:
         headers: HEADERS = {
-            "Accept": ",".join((schema_1_signed, schema_1)),
+            "Accept": ",".join((schema_2, schema_2_list)),
         }
         response = self._get(f"{name}/manifests/{reference}", scope_repo(name), headers=headers)
 
-        data = response.json()
-        return Manifest(
-            digest=response.headers["Docker-Content-Digest"],
-            content_type=response.headers.get("Content-Type", "application/json"),
-            content=data,
-        )
+        return parse_manifest_response(response)
 
     def delete_manifest(self, name: str, digest: str) -> Response:
         response = self._delete(f"{name}/manifests/{digest}", scope_repo(name))
