@@ -115,7 +115,9 @@ class Client:
             "Accept": ",".join((schema_2, schema_2_list)),
         }
         try:
-            response = self._head(f"{name}/manifests/{reference}", scope_repo(name), headers=headers)
+            response = self._head(
+                f"{name}/manifests/{reference}", scope_repo(name), headers=headers
+            )
         except HTTPError as exc:
             if exc.response.status_code == 404:
                 return None

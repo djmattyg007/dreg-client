@@ -25,7 +25,9 @@ def manifest_client(manifest_v1):
     content_length = len(json.dumps(manifest_v1))
 
     client = Mock()
-    client.check_manifest.return_value = "sha256:fc7187188888f5192efdc08682d7fa260820a41f2bdd09b7f5f9cdcb53c9fbc0"
+    client.check_manifest.return_value = (
+        "sha256:fc7187188888f5192efdc08682d7fa260820a41f2bdd09b7f5f9cdcb53c9fbc0"
+    )
     client.get_manifest.return_value = LegacyManifest(
         digest="sha256:fc7187188888f5192efdc08682d7fa260820a41f2bdd09b7f5f9cdcb53c9fbc0",
         content_type="application/vnd.docker.distribution.manifest.v1+json",
@@ -68,9 +70,13 @@ def test_check_manifest_by_tag(manifest_client):
 
 def test_check_manifest_by_digest(manifest_client):
     repo = Repository(manifest_client, "testrepo", "testns")
-    digest = repo.check_manifest("sha256:fc7187188888f5192efdc08682d7fa260820a41f2bdd09b7f5f9cdcb53c9fbc0")
+    digest = repo.check_manifest(
+        "sha256:fc7187188888f5192efdc08682d7fa260820a41f2bdd09b7f5f9cdcb53c9fbc0"
+    )
     assert digest == "sha256:fc7187188888f5192efdc08682d7fa260820a41f2bdd09b7f5f9cdcb53c9fbc0"
-    manifest_client.check_manifest.assert_called_once_with("testns/testrepo", "sha256:fc7187188888f5192efdc08682d7fa260820a41f2bdd09b7f5f9cdcb53c9fbc0")
+    manifest_client.check_manifest.assert_called_once_with(
+        "testns/testrepo", "sha256:fc7187188888f5192efdc08682d7fa260820a41f2bdd09b7f5f9cdcb53c9fbc0"
+    )
     manifest_client.get_manifest.assert_not_called()
 
 

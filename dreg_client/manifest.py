@@ -1,10 +1,14 @@
 from __future__ import annotations
 
+from dataclasses import dataclass, field
 from typing import TYPE_CHECKING, Any, List, Mapping, Optional, Sequence, Union
 
-from dataclasses import dataclass, field
-
-from .schemas import known_manifest_content_types, legacy_manifest_content_types, schema_2, schema_2_list
+from .schemas import (
+    known_manifest_content_types,
+    legacy_manifest_content_types,
+    schema_2,
+    schema_2_list,
+)
 
 
 if TYPE_CHECKING:
@@ -69,10 +73,14 @@ class UnusableImageConfigBlobPayloadError(Exception):
 def parse_image_config_blob_response(response: Response) -> ImageConfig:
     digest = response.headers.get("Docker-Content-Digest")
     if not digest:
-        raise UnusableImageConfigBlobResponseError(response, "No digest specified in response headers.")
+        raise UnusableImageConfigBlobResponseError(
+            response, "No digest specified in response headers."
+        )
     content_length_str = response.headers.get("Content-Length")
     if not content_length_str:
-        raise UnusableImageConfigBlobResponseError(response, "No content length specified in response headers.")
+        raise UnusableImageConfigBlobResponseError(
+            response, "No content length specified in response headers."
+        )
     try:
         content_length = int(content_length_str)
     except ValueError as exc:
@@ -83,19 +91,23 @@ def parse_image_config_blob_response(response: Response) -> ImageConfig:
 
     data = response.json()
     if not isinstance(data, dict):
-        raise UnusableImageConfigBlobPayloadError(response, data, "Non-dictionary payload returned.")
+        raise UnusableImageConfigBlobPayloadError(
+            response, data, "Non-dictionary payload returned."
+        )
 
     history_items: List[ImageHistoryItem] = []
     for history_item_data in data["history"]:
         empty_layer = history_item_data.get("empty_layer", False)
         comment = history_item_data.get("comment", "")
 
-        history_items.append(ImageHistoryItem(
-            created_at=history_item_data["created"],
-            created_by=history_item_data["created_by"],
-            empty_layer=empty_layer,
-            comment=comment,
-        ))
+        history_items.append(
+            ImageHistoryItem(
+                created_at=history_item_data["created"],
+                created_by=history_item_data["created_by"],
+                empty_layer=empty_layer,
+                comment=comment,
+            )
+        )
 
     return ImageConfig(
         digest=digest,
@@ -184,7 +196,9 @@ def parse_manifest_response(response: Response) -> ManifestParseOutput:
         raise UnusableManifestResponseError(response, "No digest specified in response headers")
     content_length_str = response.headers.get("Content-Length")
     if not content_length_str:
-        raise UnusableManifestResponseError(response, "No content length specified in response headers.")
+        raise UnusableManifestResponseError(
+            response, "No content length specified in response headers."
+        )
     try:
         content_length = int(content_length_str)
     except ValueError as exc:
@@ -210,7 +224,9 @@ def parse_manifest_response(response: Response) -> ManifestParseOutput:
 
     if content_type == schema_2:
         if data.get("mediaType") != content_type:
-            raise UnusableManifestPayloadError(response, data, "Mismatched media type between headers and payload.")
+            raise UnusableManifestPayloadError(
+                response, data, "Mismatched media type between headers and payload."
+            )
 
         config_data = data["config"]
         layers_data = data["layers"]
@@ -223,11 +239,13 @@ def parse_manifest_response(response: Response) -> ManifestParseOutput:
 
         layers: List[ImageLayerRef] = []
         for layer_data in layers_data:
-            layers.append(ImageLayerRef(
-                digest=layer_data["digest"],
-                content_type=layer_data["mediaType"],
-                size=layer_data["size"],
-            ))
+            layers.append(
+                ImageLayerRef(
+                    digest=layer_data["digest"],
+                    content_type=layer_data["mediaType"],
+                    size=layer_data["size"],
+                )
+            )
 
         return Manifest(
             digest=digest,
@@ -239,18 +257,22 @@ def parse_manifest_response(response: Response) -> ManifestParseOutput:
 
     if content_type == schema_2_list:
         if data.get("mediaType") != content_type:
-            raise UnusableManifestPayloadError(response, data, "Mismatched media type between headers and payload.")
+            raise UnusableManifestPayloadError(
+                response, data, "Mismatched media type between headers and payload."
+            )
 
         manifests_data = data["manifests"]
 
         manifests: List[ManifestRef] = []
         for manifest_data in manifests_data:
-            manifests.append(ManifestRef(
-                digest=manifest_data["digest"],
-                content_type=manifest_data["mediaType"],
-                size=manifest_data["size"],
-                platform=Platform.extract(manifest_data["platform"]),
-            ))
+            manifests.append(
+                ManifestRef(
+                    digest=manifest_data["digest"],
+                    content_type=manifest_data["mediaType"],
+                    size=manifest_data["size"],
+                    platform=Platform.extract(manifest_data["platform"]),
+                )
+            )
 
         return ManifestList(
             digest=digest,

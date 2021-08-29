@@ -126,7 +126,10 @@ def test_check_manifest_success():
         digest1 = client.check_manifest("testns/testrepo", "abcdef")
         assert digest1 == "sha256:1a067fa67b5bf1044c411ad73ac82cecd3d4dd2dabe7bc4d4b6dbbd55963b667"
 
-        digest2 = client.check_manifest("testns/testrepo", "sha256:1a067fa67b5bf1044c411ad73ac82cecd3d4dd2dabe7bc4d4b6dbbd55963b667")
+        digest2 = client.check_manifest(
+            "testns/testrepo",
+            "sha256:1a067fa67b5bf1044c411ad73ac82cecd3d4dd2dabe7bc4d4b6dbbd55963b667",
+        )
         assert digest2 == digest1
 
 
