@@ -95,6 +95,64 @@ def test_get_repository_tags_failure():
             client.get_repository_tags("testns/testrepo")
 
 
+def test_check_manifest_success():
+    with responses.RequestsMock() as rsps:
+        rsps.add(
+            rsps.HEAD,
+            "https://registry.example.com:5000/v2/testns/testrepo/manifests/abcdef",
+            content_type="application/vnd.docker.distribution.manifest+v1+prettyjws",
+            headers={
+                "docker-content-digest": "sha256:1a067fa67b5bf1044c411ad73ac82cecd3d4dd2dabe7bc4d4b6dbbd55963b667",
+            },
+        )
+        rsps.add(
+            rsps.HEAD,
+            "https://registry.example.com:5000/v2/testns/testrepo/manifests/sha256:1a067fa67b5bf1044c411ad73ac82cecd3d4dd2dabe7bc4d4b6dbbd55963b667",
+            content_type="application/vnd.docker.distribution.manifest+v1+prettyjws",
+            headers={
+                "docker-content-digest": "sha256:1a067fa67b5bf1044c411ad73ac82cecd3d4dd2dabe7bc4d4b6dbbd55963b667",
+            },
+        )
+
+        client = Client.build_with_session("https://registry.example.com:5000/v2/")
+
+        digest1 = client.check_manifest("testns/testrepo", "abcdef")
+        assert digest1 == "sha256:1a067fa67b5bf1044c411ad73ac82cecd3d4dd2dabe7bc4d4b6dbbd55963b667"
+
+        digest2 = client.check_manifest("testns/testrepo", "sha256:1a067fa67b5bf1044c411ad73ac82cecd3d4dd2dabe7bc4d4b6dbbd55963b667")
+        assert digest2 == digest1
+
+
+def test_check_manifest_failure():
+    with responses.RequestsMock() as rsps:
+        rsps.add(
+            rsps.HEAD,
+            "https://registry.example.com:5000/v2/testns/testrepo/manifests/abcdef",
+            status=404,
+        )
+
+        client = Client.build_with_session("https://registry.example.com:5000/v2/")
+        digest = client.check_manifest("testns/testrepo", "abcdef")
+        assert digest is None
+
+    with responses.RequestsMock() as rsps:
+        rsps.add(
+            rsps.HEAD,
+            "https://registry.example.com:5000/v2/testns/testrepo/manifests/abcdef",
+            status=500,
+        )
+
+        client = Client.build_with_session("https://registry.example.com:5000/v2/")
+        try:
+            client.check_manifest("testns/testrepo", "abcdef")
+        except requests.HTTPError as exc:
+            assert exc.response.status_code == 500
+        else:
+            pytest.fail(
+                "Client.get_manifest() did not throw an exception for HTTP 500 as expected."
+            )
+
+
 def test_get_manifest_success(manifest_v1):
     with responses.RequestsMock() as rsps:
         rsps.add(

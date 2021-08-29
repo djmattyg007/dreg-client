@@ -3,7 +3,7 @@ from __future__ import annotations
 import logging
 from typing import TYPE_CHECKING, Dict, Optional, Sequence, TypedDict
 
-from requests import RequestException
+from requests import HTTPError, RequestException
 from requests_toolbelt.sessions import BaseUrlSession
 
 from .manifest import Manifest
@@ -62,6 +62,18 @@ class Client:
             session.auth = auth
         return Client(session, auth_service=auth_service)
 
+    def _head(self, url_path: str, scope: str, headers: Optional[HEADERS] = None) -> Response:
+        if not headers:
+            headers = {}
+
+        if self._auth_service:
+            token = self._auth_service.request_token(scope)
+            headers["Authorization"] = f"Bearer {token}"
+
+        response = self._session.head(url_path, headers=headers)
+        response.raise_for_status()
+        return response
+
     def _get(self, url_path: str, scope: str, headers: Optional[HEADERS] = None) -> Response:
         if not headers:
             headers = {}
@@ -102,6 +114,19 @@ class Client:
     def get_repository_tags(self, name: str) -> TagsResponse:
         response = self._get(f"{name}/tags/list", scope_repo(name))
         return response.json()
+
+    def check_manifest(self, name: str, reference: str) -> Optional[str]:
+        headers: HEADERS = {
+            "Accept": ",".join((schema_1_signed, schema_1)),
+        }
+        try:
+            response = self._head(f"{name}/manifests/{reference}", scope_repo(name), headers=headers)
+        except HTTPError as exc:
+            if exc.response.status_code == 404:
+                return None
+            raise
+
+        return response.headers.get("Docker-Content-Digest", None)
 
     def get_manifest(self, name: str, reference: str) -> Manifest:
         headers: HEADERS = {

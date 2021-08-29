@@ -30,6 +30,9 @@ class Repository:
 
         return self._tags
 
+    def check_manifest(self, reference: str) -> Optional[str]:
+        return self._client.check_manifest(self.name, reference)
+
     def get_manifest(self, reference: str) -> Manifest:
         """
         Return a manifest for a given reference (a tag or a digest)
