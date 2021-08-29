@@ -8,12 +8,12 @@ from dreg_client import Client
 FIXTURES_DIR = Path(__file__).parent / "fixtures"
 
 
-def test_base_client(registry):
+def test_client(registry):
     client = Client.build_with_session("http://localhost:5000/v2/")
     assert client.catalog() == {"repositories": []}
 
 
-def test_base_client_edit_manifest(docker_client, registry):
+def test_client_manifest_interactions(docker_client, registry):
     client = Client.build_with_session("http://localhost:5000/v2/")
 
     docker_client.images.build(
