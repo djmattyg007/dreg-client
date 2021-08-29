@@ -4,7 +4,7 @@ Docker Registry Client
 
 |ci| |pypi| |license|
 
-A Python REST client for Docker Registries.
+A Python REST client for Docker Registries. Pronounced ``dee-redge client``.
 
 It's useful for automating image tagging and untagging
 
