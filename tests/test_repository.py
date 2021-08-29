@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import json
 from unittest.mock import Mock
 
 import pytest
@@ -20,11 +21,15 @@ def tags_client():
 
 @pytest.fixture
 def manifest_client(manifest_v1):
+    # TODO: Clean this up once this PR is released: https://github.com/getsentry/responses/pull/398
+    content_length = len(json.dumps(manifest_v1))
+
     client = Mock()
     client.check_manifest.return_value = "sha256:fc7187188888f5192efdc08682d7fa260820a41f2bdd09b7f5f9cdcb53c9fbc0"
     client.get_manifest.return_value = LegacyManifest(
         digest="sha256:fc7187188888f5192efdc08682d7fa260820a41f2bdd09b7f5f9cdcb53c9fbc0",
         content_type="application/vnd.docker.distribution.manifest.v1+json",
+        content_length=content_length,
         content=manifest_v1,
     )
     return client

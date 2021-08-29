@@ -3,7 +3,7 @@ from __future__ import annotations
 from typing import TYPE_CHECKING, Optional, Sequence
 
 from .client import Client
-from .manifest import Manifest
+from .manifest import ManifestParseOutput
 
 
 if TYPE_CHECKING:
@@ -33,7 +33,7 @@ class Repository:
     def check_manifest(self, reference: str) -> Optional[str]:
         return self._client.check_manifest(self.name, reference)
 
-    def get_manifest(self, reference: str) -> Manifest:
+    def get_manifest(self, reference: str) -> ManifestParseOutput:
         """
         Return a manifest for a given reference (a tag or a digest)
         """

@@ -41,6 +41,7 @@ class ImageHistoryItem:
 @dataclass(frozen=True)
 class ImageConfig:
     digest: str
+    content_length: int
     created_at: str = field(compare=False)
     config: Mapping[str, Any] = field(compare=False, repr=False)
     history: Sequence[ImageHistoryItem] = field(compare=False, repr=False)
@@ -69,6 +70,16 @@ def parse_image_config_blob_response(response: Response) -> ImageConfig:
     digest = response.headers.get("Docker-Content-Digest")
     if not digest:
         raise UnusableImageConfigBlobResponseError(response, "No digest specified in response headers.")
+    content_length_str = response.headers.get("Content-Length")
+    if not content_length_str:
+        raise UnusableImageConfigBlobResponseError(response, "No content length specified in response headers.")
+    try:
+        content_length = int(content_length_str)
+    except ValueError as exc:
+        raise UnusableImageConfigBlobResponseError(
+            response,
+            "Invalid content length specified in response headers.",
+        ) from exc
 
     data = response.json()
     if not isinstance(data, dict):
@@ -88,6 +99,7 @@ def parse_image_config_blob_response(response: Response) -> ImageConfig:
 
     return ImageConfig(
         digest=digest,
+        content_length=content_length,
         created_at=data["created"],
         config=data["config"],
         history=tuple(history_items),
@@ -114,6 +126,7 @@ class ImageConfigRef:
 class Manifest:
     digest: str
     content_type: str
+    content_length: int
     config: ImageConfigRef = field(compare=False, repr=False)
     layers: Sequence[ImageLayerRef] = field(compare=False, repr=False)
 
@@ -134,6 +147,7 @@ class ManifestRef:
 class ManifestList:
     digest: str
     content_type: str
+    content_length: int
     manifests: Sequence[ManifestRef] = field(compare=False, repr=False)
 
 
@@ -141,6 +155,7 @@ class ManifestList:
 class LegacyManifest:
     digest: str
     content_type: str
+    content_length: int
     content: Mapping = field(compare=False, repr=False)
 
 
@@ -167,6 +182,16 @@ def parse_manifest_response(response: Response) -> ManifestParseOutput:
     digest = response.headers.get("Docker-Content-Digest")
     if not digest:
         raise UnusableManifestResponseError(response, "No digest specified in response headers")
+    content_length_str = response.headers.get("Content-Length")
+    if not content_length_str:
+        raise UnusableManifestResponseError(response, "No content length specified in response headers.")
+    try:
+        content_length = int(content_length_str)
+    except ValueError as exc:
+        raise UnusableManifestResponseError(
+            response,
+            "Invalid content length specified in response headers.",
+        ) from exc
 
     data = response.json()
     if not isinstance(data, dict):
@@ -176,6 +201,7 @@ def parse_manifest_response(response: Response) -> ManifestParseOutput:
         return LegacyManifest(
             digest=digest,
             content_type=content_type,
+            content_length=content_length,
             content=data,
         )
 
@@ -206,6 +232,7 @@ def parse_manifest_response(response: Response) -> ManifestParseOutput:
         return Manifest(
             digest=digest,
             content_type=content_type,
+            content_length=content_length,
             config=config,
             layers=tuple(layers),
         )
@@ -228,6 +255,7 @@ def parse_manifest_response(response: Response) -> ManifestParseOutput:
         return ManifestList(
             digest=digest,
             content_type=content_type,
+            content_length=content_length,
             manifests=tuple(manifests),
         )
 

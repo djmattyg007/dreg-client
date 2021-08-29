@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+import json
+
 import pytest
 import requests
 import responses
@@ -105,7 +107,8 @@ def test_check_manifest_success():
             "https://registry.example.com:5000/v2/testns/testrepo/manifests/abcdef",
             content_type="application/vnd.docker.distribution.manifest+v1+prettyjws",
             headers={
-                "docker-content-digest": "sha256:1a067fa67b5bf1044c411ad73ac82cecd3d4dd2dabe7bc4d4b6dbbd55963b667",
+                "Content-Length": "1000",
+                "Docker-Content-Digest": "sha256:1a067fa67b5bf1044c411ad73ac82cecd3d4dd2dabe7bc4d4b6dbbd55963b667",
             },
         )
         rsps.add(
@@ -113,7 +116,8 @@ def test_check_manifest_success():
             "https://registry.example.com:5000/v2/testns/testrepo/manifests/sha256:1a067fa67b5bf1044c411ad73ac82cecd3d4dd2dabe7bc4d4b6dbbd55963b667",
             content_type="application/vnd.docker.distribution.manifest+v1+prettyjws",
             headers={
-                "docker-content-digest": "sha256:1a067fa67b5bf1044c411ad73ac82cecd3d4dd2dabe7bc4d4b6dbbd55963b667",
+                "Content-Length": "1000",
+                "Docker-Content-Digest": "sha256:1a067fa67b5bf1044c411ad73ac82cecd3d4dd2dabe7bc4d4b6dbbd55963b667",
             },
         )
 
@@ -157,6 +161,9 @@ def test_check_manifest_failure():
 
 
 def test_get_manifest_success(manifest_v1):
+    # TODO: Clean this up once this PR is released: https://github.com/getsentry/responses/pull/398
+    content_length = len(json.dumps(manifest_v1))
+
     with responses.RequestsMock() as rsps:
         rsps.add(
             rsps.GET,
@@ -164,7 +171,8 @@ def test_get_manifest_success(manifest_v1):
             json=manifest_v1,
             content_type="application/vnd.docker.distribution.manifest.v1+prettyjws",
             headers={
-                "docker-content-digest": "sha256:1a067fa67b5bf1044c411ad73ac82cecd3d4dd2dabe7bc4d4b6dbbd55963b667",
+                "Content-Length": str(content_length),
+                "Docker-Content-Digest": "sha256:1a067fa67b5bf1044c411ad73ac82cecd3d4dd2dabe7bc4d4b6dbbd55963b667",
             },
         )
         rsps.add(
@@ -173,7 +181,8 @@ def test_get_manifest_success(manifest_v1):
             json=manifest_v1,
             content_type="application/vnd.docker.distribution.manifest.v1+prettyjws",
             headers={
-                "docker-content-digest": "sha256:1a067fa67b5bf1044c411ad73ac82cecd3d4dd2dabe7bc4d4b6dbbd55963b667",
+                "Content-Length": str(content_length),
+                "Docker-Content-Digest": "sha256:1a067fa67b5bf1044c411ad73ac82cecd3d4dd2dabe7bc4d4b6dbbd55963b667",
             },
         )
 
@@ -224,7 +233,8 @@ def test_get_manifest_failure():
             content_type="application/vnd.docker.distribution.manifest.v1+prettyjws",
             body="{'abc'}",
             headers={
-                "docker-content-digest": "sha256:0ca2177c6caa494f76e40d9badc253d8bbca6df4cbe1e1630875b7c087f85d56",
+                "Content-Length": "7",
+                "Docker-Content-Digest": "sha256:0ca2177c6caa494f76e40d9badc253d8bbca6df4cbe1e1630875b7c087f85d56",
             },
         )
 
