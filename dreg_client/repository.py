@@ -1,9 +1,11 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Optional, Sequence
+from typing import TYPE_CHECKING, Optional, Sequence, Union
 
 from .client import Client
-from .manifest import ManifestParseOutput
+from .image import Image
+from .manifest import LegacyManifest, ManifestList, ManifestParseOutput, ManifestRef
+from .schemas import schema_2_list
 
 
 if TYPE_CHECKING:
@@ -29,6 +31,58 @@ class Repository:
             self.refresh()
 
         return self._tags
+
+    def get_image(self, reference: str) -> Union[Image, LegacyManifest]:
+        manifest = self.get_manifest(reference)
+        if isinstance(manifest, LegacyManifest):
+            return manifest
+        if isinstance(manifest, ManifestList):
+            return Image(self._client, manifest)
+
+        # Synthesise a manifest list
+        image_config = self._client.get_image_config_blob(self.name, manifest.config.digest)
+
+        import json
+        from collections import OrderedDict
+        from hashlib import sha256
+
+        manifest_ref_platform = OrderedDict()
+        manifest_ref_platform["architecture"] = image_config.platform.architecture
+        manifest_ref_platform["os"] = image_config.platform.os
+        if image_config.platform.variant:
+            manifest_ref_platform["manifests"] = image_config.platform.variant
+
+        manifest_ref_data = OrderedDict()
+        manifest_ref_data["mediaType"] = manifest.content_type
+        manifest_ref_data["digest"] = manifest.digest
+        manifest_ref_data["size"] = manifest.content_length
+        manifest_ref_data["platform"] = manifest_ref_platform
+
+        manifest_list_data = OrderedDict()
+        manifest_list_data["mediaType"] = schema_2_list
+        manifest_list_data["schemaVersion"] = 2
+        manifest_list_data["manifests"] = [manifest_ref_data]
+
+        manifest_list_json = json.dumps(manifest_list_data, indent=3)
+        digest_hash = sha256()
+        digest_hash.update(manifest_list_json)
+        digest = digest_hash.hexdigest()
+        content_length = len(manifest_list_json)
+
+        manifest_ref = ManifestRef(
+            digest=manifest.digest,
+            content_type=manifest.content_type,
+            size=manifest.content_length,
+            platform=image_config.platform,
+        )
+        manifest_list = ManifestList(
+            digest=digest,
+            content_type=schema_2_list,
+            content_length=content_length,
+            manifests=(manifest_ref,),
+        )
+
+        return Image(self._client, manifest_list)
 
     def check_manifest(self, reference: str) -> Optional[str]:
         return self._client.check_manifest(self.name, reference)

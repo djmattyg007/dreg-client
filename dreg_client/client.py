@@ -1,12 +1,17 @@
 from __future__ import annotations
 
 import logging
-from typing import TYPE_CHECKING, Dict, Optional, Sequence, TypedDict, Union
+from typing import TYPE_CHECKING, Dict, Optional, Sequence, TypedDict
 
 from requests import HTTPError, RequestException
 from requests_toolbelt.sessions import BaseUrlSession
 
-from .manifest import ManifestParseOutput, parse_manifest_response
+from .manifest import (
+    ImageConfig,
+    ManifestParseOutput,
+    parse_image_config_blob_response,
+    parse_manifest_response,
+)
 from .schemas import schema_2, schema_2_list
 
 
@@ -136,6 +141,10 @@ class Client:
     def delete_manifest(self, name: str, digest: str) -> Response:
         response = self._delete(f"{name}/manifests/{digest}", scope_repo(name))
         return response
+
+    def get_image_config_blob(self, name: str, digest: str) -> ImageConfig:
+        response = self.get_blob(name, digest)
+        return parse_image_config_blob_response(response)
 
     def get_blob(self, name: str, digest: str) -> Response:
         response = self._get(f"{name}/blobs/{digest}", scope_repo(name))
