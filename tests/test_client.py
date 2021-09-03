@@ -7,7 +7,7 @@ import requests
 import responses
 
 from dreg_client.client import Client
-from dreg_client.manifest import LegacyManifest
+from dreg_client.manifest import ImageConfig, LegacyManifest, Platform
 
 from .conftest import DockerJsonBlob
 
@@ -284,6 +284,33 @@ def test_delete_manifest_failure():
             pytest.fail(
                 "Client.delete_manifest() did not throw an exception for HTTP 404 as expected."
             )
+
+
+def test_get_image_config_blob_success(blob_container_image_v1: DockerJsonBlob):
+    # TODO: Clean this up once this PR is released: https://github.com/getsentry/responses/pull/398
+    content_length = len(json.dumps(blob_container_image_v1))
+
+    with responses.RequestsMock() as rsps:
+        rsps.add(
+            rsps.GET,
+            "https://registry.example.com:5000/v2/testns/testrepo/blobs/sha256:1a067abcdef121044c411ad73ac82cecd098762dabe7bc4d4b6dbbd55963b667",
+            json=blob_container_image_v1,
+            headers={
+                "Content-Length": str(content_length),
+                "Docker-Content-Digest": "sha256:1a067abcdef121044c411ad73ac82cecd098762dabe7bc4d4b6dbbd55963b667",
+            },
+        )
+
+        client = Client.build_with_session("https://registry.example.com:5000/v2/")
+        config = client.get_image_config_blob(
+            "testns/testrepo",
+            "sha256:1a067abcdef121044c411ad73ac82cecd098762dabe7bc4d4b6dbbd55963b667",
+        )
+
+        assert isinstance(config, ImageConfig)
+        assert config.digest == "sha256:1a067abcdef121044c411ad73ac82cecd098762dabe7bc4d4b6dbbd55963b667"
+        assert config.platform == Platform("linux", "amd64", None)
+        assert config.created_at == "2021-08-28T01:35:59.758616391Z"
 
 
 def test_get_blob_success(blob_container_image_v1: DockerJsonBlob):
