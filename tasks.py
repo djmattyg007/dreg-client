@@ -33,7 +33,7 @@ def test(c, onefile="", verbose=False):
         "--cov-report=term-missing",
     ]
     if in_ci:
-        pytest_args.extend(("--cov-report-xml", "--strict-markers"))
+        pytest_args.extend(("--cov-report=xml", "--strict-markers"))
     else:
         pytest_args.append("--cov-report=html")
 
