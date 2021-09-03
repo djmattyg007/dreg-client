@@ -3,18 +3,23 @@ from __future__ import annotations
 from pathlib import Path
 from typing import Sequence
 
+import pytest
+from docker import DockerClient
+
 from dreg_client import Client, Manifest
 
 
 FIXTURES_DIR = Path(__file__).parent / "fixtures"
 
 
-def test_client(registry):
+@pytest.mark.usefixtures("registry")
+def test_client():
     client = Client.build_with_session("http://localhost:5000/v2/")
     assert client.catalog() == {"repositories": []}
 
 
-def test_client_manifest_interactions(docker_client, registry):
+@pytest.mark.usefixtures("registry")
+def test_client_manifest_interactions(docker_client: DockerClient):
     client = Client.build_with_session("http://localhost:5000/v2/")
 
     docker_client.images.build(
