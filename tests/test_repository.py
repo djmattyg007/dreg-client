@@ -8,6 +8,8 @@ import pytest
 from dreg_client.manifest import LegacyManifest
 from dreg_client.repository import Repository
 
+from .conftest import DockerJsonBlob
+
 
 @pytest.fixture
 def tags_client():
@@ -30,7 +32,7 @@ def tags_missing_client():
 
 
 @pytest.fixture
-def manifest_client(manifest_v1):
+def manifest_client(manifest_v1: DockerJsonBlob):
     # TODO: Clean this up once this PR is released: https://github.com/getsentry/responses/pull/398
     content_length = len(json.dumps(manifest_v1))
 
@@ -74,6 +76,17 @@ def test_tags_refreshes_once(tags_client):
     for _ in range(5):
         repo.tags()
         tags_client.get_repository_tags.assert_called_once_with("testns/testrepo")
+
+
+def test_get_image_legacy_manifest(manifest_client):
+    repo = Repository(manifest_client, "testrepo", "testns")
+    image = repo.get_image("2021")
+    assert isinstance(image, LegacyManifest)
+    assert (
+        image.digest == "sha256:fc7187188888f5192efdc08682d7fa260820a41f2bdd09b7f5f9cdcb53c9fbc0"
+    )
+    manifest_client.get_manifest.assert_called_once_with("testns/testrepo", "2021")
+    manifest_client.check_manifest.assert_not_called()
 
 
 def test_check_manifest_by_tag(manifest_client):
