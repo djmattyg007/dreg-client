@@ -8,13 +8,20 @@ import pytest
 import responses
 from freezegun import freeze_time
 
-from dreg_client.auth_service import AuthService, AuthServiceFailure, AuthToken, DockerTokenAuthService, make_expires_at
+from dreg_client.auth_service import (
+    AuthService,
+    AuthServiceFailure,
+    AuthToken,
+    DockerTokenAuthService,
+    make_expires_at,
+)
 
 
 def cbreq(cb: Callable[[], Mapping[str, Any]]) -> Callable[..., Tuple[int, Mapping[str, str], str]]:
     def inner(*args) -> Tuple[int, Mapping[str, str], str]:
         result = cb()
         return 200, {"Content-Type": "application/json"}, json.dumps(result)
+
     return inner
 
 
@@ -238,7 +245,9 @@ def test_repeat_request_token(auth_service: DockerTokenAuthService, token_field:
 
 
 @pytest.mark.parametrize("token_field", ("token", "access_token"))
-def test_repeat_request_token_different_scope(auth_service: DockerTokenAuthService, token_field: str):
+def test_repeat_request_token_different_scope(
+    auth_service: DockerTokenAuthService, token_field: str
+):
     with responses.RequestsMock() as rsps:
         catalog_token = str(uuid4())
         catalog_scope = "registry:catalog:*"
