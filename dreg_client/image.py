@@ -1,8 +1,9 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, AbstractSet, Optional
+import dataclasses
+from typing import TYPE_CHECKING, AbstractSet, Optional, Sequence
 
-from .manifest import Manifest, ManifestList, ManifestRef, Platform
+from .manifest import ImageConfig, ImageLayerRef, Manifest, ManifestList, ManifestRef, Platform
 
 
 if TYPE_CHECKING:
@@ -19,6 +20,13 @@ class UnexpectedImageManifestError(Exception):
     def __init__(self, digest: str, message: str):
         super().__init__(message)
         self.digest = digest
+
+
+@dataclasses.dataclass(frozen=True)
+class PlatformImage:
+    digest: str
+    config: ImageConfig = dataclasses.field(compare=False, repr=False)
+    layers: Sequence[ImageLayerRef] = dataclasses.field(compare=False, repr=False)
 
 
 class Image:
@@ -47,6 +55,15 @@ class Image:
                 lambda manifest_ref: manifest_ref.platform,
                 self._manifest_list.manifests,
             )
+        )
+
+    def get_platform_image(self, platform: Platform) -> PlatformImage:
+        manifest = self.fetch_manifest_by_platform(platform)
+        config = self._client.get_image_config_blob(self._repo, manifest.config.digest)
+        return PlatformImage(
+            digest=manifest.digest,
+            config=config,
+            layers=manifest.layers,
         )
 
     def _fetch_manifest(self, digest: str, errmsg: str) -> Manifest:
@@ -100,6 +117,7 @@ class Image:
 
 __all__ = (
     "Image",
+    "PlatformImage",
     "UnavailableImagePlatformError",
     "UnexpectedImageManifestError",
 )

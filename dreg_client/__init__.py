@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from .auth_service import AuthService, AuthServiceFailure, DockerTokenAuthService
 from .client import Client
-from .image import Image, UnavailableImagePlatformError, UnexpectedImageManifestError
+from .image import Image, PlatformImage, UnavailableImagePlatformError, UnexpectedImageManifestError
 from .manifest import (
     ImageConfig,
     LegacyManifest,
@@ -29,6 +29,7 @@ __all__ = (
     "Manifest",
     "ManifestList",
     "Platform",
+    "PlatformImage",
     "Registry",
     "Repository",
     "UnavailableImagePlatformError",
