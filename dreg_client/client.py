@@ -3,7 +3,7 @@ from __future__ import annotations
 import logging
 from typing import TYPE_CHECKING, Callable, Dict, Optional, Sequence, TypedDict, cast
 
-from requests import HTTPError, RequestException
+from requests import HTTPError, Response, RequestException
 from requests_toolbelt.sessions import BaseUrlSession
 
 from .manifest import (
@@ -16,8 +16,6 @@ from .schemas import schema_2, schema_2_list
 
 
 if TYPE_CHECKING:
-    from requests import Response
-
     from ._types import RequestsAuth
     from .auth_service import AuthService
 
