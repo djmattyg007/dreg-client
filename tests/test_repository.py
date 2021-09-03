@@ -20,6 +20,16 @@ def tags_client():
 
 
 @pytest.fixture
+def tags_missing_client():
+    client = Mock()
+    client.get_repository_tags.return_value = {
+        "name": "testns/testrepo",
+        "tags": None,
+    }
+    return client
+
+
+@pytest.fixture
 def manifest_client(manifest_v1):
     # TODO: Clean this up once this PR is released: https://github.com/getsentry/responses/pull/398
     content_length = len(json.dumps(manifest_v1))
@@ -51,6 +61,12 @@ def test_tags(tags_client):
     repo = Repository(tags_client, "testrepo", "testns")
     tags = repo.tags()
     assert sorted(tags) == ["2019", "2020", "2021"]
+
+
+def test_missing_tags(tags_missing_client):
+    repo = Repository(tags_missing_client, "testrepo", "testns")
+    tags = repo.tags()
+    assert tags == ()
 
 
 def test_tags_refreshes_once(tags_client):

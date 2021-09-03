@@ -3,7 +3,7 @@ from __future__ import annotations
 import logging
 from typing import TYPE_CHECKING, Callable, Dict, Optional, Sequence, TypedDict, cast
 
-from requests import HTTPError, Response, RequestException
+from requests import HTTPError, RequestException, Response
 from requests_toolbelt.sessions import BaseUrlSession
 
 from .manifest import (

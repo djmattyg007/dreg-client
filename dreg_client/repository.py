@@ -30,7 +30,7 @@ class Repository:
         if self._tags is None:
             self.refresh()
 
-        if self._tags is None:
+        if self._tags is None:  # pragma: no cover
             raise TypeError("Loading repository tags failed.")
 
         return self._tags

@@ -18,8 +18,7 @@ logger = logging.getLogger(__name__)
 
 
 def make_expires_at(validity_duration: int) -> int:
-    expires_at = int(time.time()) + validity_duration - 5
-    return max(expires_at, 55)
+    return int(time.time()) + max(validity_duration - 5, 55)
 
 
 @dataclasses.dataclass(frozen=True, eq=False)
