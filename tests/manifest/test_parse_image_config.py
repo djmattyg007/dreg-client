@@ -4,7 +4,11 @@ from uuid import uuid4
 
 import pytest
 
-from dreg_client.manifest import UnusableImageConfigBlobResponseError, UnusableImageConfigBlobPayloadError, parse_image_config_blob_response
+from dreg_client.manifest import (
+    UnusableImageConfigBlobPayloadError,
+    UnusableImageConfigBlobResponseError,
+    parse_image_config_blob_response,
+)
 
 
 def test_missing_digest_header():

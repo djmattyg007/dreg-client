@@ -4,7 +4,11 @@ from uuid import uuid4
 
 import pytest
 
-from dreg_client.manifest import UnusableManifestResponseError, UnusableManifestPayloadError, parse_manifest_response
+from dreg_client.manifest import (
+    UnusableManifestPayloadError,
+    UnusableManifestResponseError,
+    parse_manifest_response,
+)
 
 
 @pytest.mark.parametrize("content_type", ("text/plain", "application/json", "text/html"))

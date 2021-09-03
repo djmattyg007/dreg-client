@@ -303,7 +303,9 @@ def parse_manifest_response(response: Response) -> ManifestParseOutput:
             manifests=frozenset(manifests),
         )
 
-    raise UnusableManifestResponseError(response, "Unknown Content-Type header in response.")  # pragma: no cover
+    raise UnusableManifestResponseError(
+        response, "Unknown Content-Type header in response."
+    )  # pragma: no cover
 
 
 __all__ = (
