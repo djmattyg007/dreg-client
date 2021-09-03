@@ -309,6 +309,7 @@ def test_get_image_config_blob_success(blob_container_image_v1: DockerJsonBlob):
 
         assert isinstance(config, ImageConfig)
         assert config.digest == "sha256:1a067abcdef121044c411ad73ac82cecd098762dabe7bc4d4b6dbbd55963b667"
+        assert config.platform_name == "linux/amd64"
         assert config.platform == Platform("linux", "amd64", None)
         assert config.created_at == "2021-08-28T01:35:59.758616391Z"
 
