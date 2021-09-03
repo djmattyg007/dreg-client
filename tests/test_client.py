@@ -9,6 +9,8 @@ import responses
 from dreg_client.client import Client
 from dreg_client.manifest import LegacyManifest
 
+from .conftest import DockerJsonBlob
+
 
 def test_check_status_success():
     with responses.RequestsMock() as rsps:
@@ -163,7 +165,7 @@ def test_check_manifest_failure():
             )
 
 
-def test_get_manifest_success(manifest_v1):
+def test_get_manifest_success(manifest_v1: DockerJsonBlob):
     # TODO: Clean this up once this PR is released: https://github.com/getsentry/responses/pull/398
     content_length = len(json.dumps(manifest_v1))
 
@@ -284,7 +286,7 @@ def test_delete_manifest_failure():
             )
 
 
-def test_get_blob_success(blob_container_image_v1):
+def test_get_blob_success(blob_container_image_v1: DockerJsonBlob):
     with responses.RequestsMock() as rsps:
         rsps.add(
             rsps.GET,
