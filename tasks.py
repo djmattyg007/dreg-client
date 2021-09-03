@@ -47,5 +47,8 @@ def test(c, onefile="", verbose=False):
 
 
 @task
-def type_check(c):
-    c.run("mypy dreg_client tests", pty=pty)
+def type_check(c, strict=False):
+    mypy_args = ["mypy", "dreg_client", "tests"]
+    if strict:
+        mypy_args.append("--strict")
+    c.run(" ".join(mypy_args), pty=pty)

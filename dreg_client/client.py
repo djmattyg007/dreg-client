@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import logging
-from typing import TYPE_CHECKING, Dict, Optional, Sequence, TypedDict
+from typing import TYPE_CHECKING, Callable, Dict, Optional, Sequence, TypedDict, cast
 
 from requests import HTTPError, RequestException
 from requests_toolbelt.sessions import BaseUrlSession
@@ -28,7 +28,7 @@ logger = logging.getLogger(__name__)
 HEADERS = Dict[str, str]
 
 scope_catalog = "registry:catalog:*"
-scope_repo = lambda repo: f"repository:{repo}:*"
+scope_repo: Callable[[str], str] = lambda repo: f"repository:{repo}:*"
 
 
 class CatalogResponse(TypedDict):
@@ -70,7 +70,7 @@ class Client:
             token = self._auth_service.request_token(scope)
             headers["Authorization"] = f"Bearer {token}"
 
-        response = self._session.head(url_path, headers=headers)
+        response = cast(Response, self._session.head(url_path, headers=headers))
         response.raise_for_status()
         return response
 
@@ -82,7 +82,7 @@ class Client:
             token = self._auth_service.request_token(scope)
             headers["Authorization"] = f"Bearer {token}"
 
-        response = self._session.get(url_path, headers=headers)
+        response = cast(Response, self._session.get(url_path, headers=headers))
         response.raise_for_status()
         return response
 
@@ -94,7 +94,7 @@ class Client:
             token = self._auth_service.request_token(scope)
             headers["Authorization"] = f"Bearer {token}"
 
-        response = self._session.delete(url_path, headers=headers)
+        response = cast(Response, self._session.delete(url_path, headers=headers))
         response.raise_for_status()
         return response
 
@@ -109,11 +109,11 @@ class Client:
 
     def catalog(self) -> CatalogResponse:
         response = self._get("_catalog", scope_catalog)
-        return response.json()
+        return cast(CatalogResponse, response.json())
 
     def get_repository_tags(self, name: str) -> TagsResponse:
         response = self._get(f"{name}/tags/list", scope_repo(name))
-        return response.json()
+        return cast(TagsResponse, response.json())
 
     def check_manifest(self, name: str, reference: str) -> Optional[str]:
         headers: HEADERS = {

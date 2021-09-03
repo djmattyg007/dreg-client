@@ -190,7 +190,7 @@ class LegacyManifest:
     digest: str
     content_type: str
     content_length: int
-    content: Mapping = field(compare=False, repr=False)
+    content: Mapping[str, Any] = field(compare=False, repr=False)
 
 
 class UnusableManifestResponseError(Exception):

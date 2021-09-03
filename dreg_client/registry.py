@@ -45,7 +45,7 @@ class Registry:
 
         return Repository(self._client, repository, namespace=namespace)
 
-    def repositories(self, namespace=None) -> Mapping[str, Repository]:
+    def repositories(self, namespace: Optional[str] = None) -> Mapping[str, Repository]:
         if not self._repositories:
             self.refresh()
 

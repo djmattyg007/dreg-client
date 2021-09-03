@@ -9,14 +9,6 @@ from dreg_client.registry import Registry
 from dreg_client.repository import Repository
 
 
-def flatten_dict(input_dict):
-    for val in input_dict.values():
-        if isinstance(val, dict):
-            yield from flatten_dict(val)
-        else:
-            yield val
-
-
 @pytest.fixture
 def client():
     client = Mock()

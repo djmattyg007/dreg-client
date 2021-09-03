@@ -74,7 +74,7 @@ class Repository:
         else:
             self._tags = tuple(response["tags"])
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return f"Repository({self.name})"
 
 
