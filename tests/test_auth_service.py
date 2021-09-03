@@ -17,8 +17,12 @@ from dreg_client.auth_service import (
 )
 
 
-def cbreq(cb: Callable[[], Mapping[str, Any]]) -> Callable[..., Tuple[int, Mapping[str, str], str]]:
-    def inner(*args) -> Tuple[int, Mapping[str, str], str]:
+# TODO: This should be importable directly from the responses package
+CallbackResponseReturn = Tuple[int, Mapping[str, str], str]
+
+
+def cbreq(cb: Callable[[], Mapping[str, Any]]) -> Callable[..., CallbackResponseReturn]:
+    def inner(*args) -> CallbackResponseReturn:
         result = cb()
         return 200, {"Content-Type": "application/json"}, json.dumps(result)
 
