@@ -5,6 +5,7 @@ from .client import Client
 from .image import Image, PlatformImage, UnavailableImagePlatformError, UnexpectedImageManifestError
 from .manifest import (
     ImageConfig,
+    InvalidPlatformNameError,
     LegacyManifest,
     Manifest,
     ManifestList,
@@ -25,6 +26,7 @@ __all__ = (
     "DockerTokenAuthService",
     "Image",
     "ImageConfig",
+    "InvalidPlatformNameError",
     "LegacyManifest",
     "Manifest",
     "ManifestList",
