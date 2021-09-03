@@ -29,7 +29,7 @@ class AuthToken:
 
     @property
     def has_expired(self) -> bool:
-        return time.time() > self.expires_at
+        return time.time() >= self.expires_at
 
 
 class AuthServiceFailure(Exception):  # noqa: N818
@@ -50,7 +50,7 @@ class DockerTokenAuthService(AuthService):
     @classmethod
     def build_with_session(
         cls, base_url: str, service: str, auth: RequestsAuth = None
-    ) -> AuthService:
+    ) -> DockerTokenAuthService:
         session = BaseUrlSession(base_url)
         session.params["service"] = service
         session.auth = auth
