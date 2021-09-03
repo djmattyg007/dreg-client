@@ -2,10 +2,10 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING, Optional, Sequence, Union
 
+from ._synth import synth_manifest_list_from_manifest
 from .client import Client
 from .image import Image
 from .manifest import LegacyManifest, ManifestList, ManifestParseOutput
-from ._synth import synth_manifest_list_from_manifest
 
 
 if TYPE_CHECKING:

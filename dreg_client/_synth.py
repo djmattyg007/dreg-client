@@ -7,7 +7,9 @@ from .manifest import ImageConfig, Manifest, ManifestList, ManifestRef
 from .schemas import schema_2_list
 
 
-def synth_manifest_list_from_manifest(manifest: Manifest, image_config: ImageConfig) -> ManifestList:
+def synth_manifest_list_from_manifest(
+    manifest: Manifest, image_config: ImageConfig
+) -> ManifestList:
     manifest_ref_platform: Dict[str, Any] = OrderedDict()
     manifest_ref_platform["architecture"] = image_config.platform.architecture
     manifest_ref_platform["os"] = image_config.platform.os
