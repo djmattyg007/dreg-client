@@ -1,5 +1,5 @@
 import re
-from unittest import mock
+from unittest.mock import Mock
 from uuid import uuid4
 
 import pytest
@@ -12,7 +12,7 @@ from dreg_client.manifest import (
 
 
 def test_missing_digest_header():
-    response = mock.Mock()
+    response = Mock()
     response.headers = {}
 
     errmsg = "^" + re.escape("No digest specified in response headers.") + "$"
@@ -21,7 +21,7 @@ def test_missing_digest_header():
 
 
 def test_missing_contentlength_header():
-    response = mock.Mock()
+    response = Mock()
     response.headers = {
         "Docker-Content-Digest": str(uuid4()),
     }
@@ -32,7 +32,7 @@ def test_missing_contentlength_header():
 
 
 def test_invalid_contentlength_header():
-    response = mock.Mock()
+    response = Mock()
     response.headers = {
         "Content-Length": "docker",
         "Docker-Content-Digest": str(uuid4()),
@@ -46,7 +46,7 @@ def test_invalid_contentlength_header():
 
 
 def test_invalid_json():
-    response = mock.Mock()
+    response = Mock()
     response.headers = {
         "Content-Length": "42",
         "Docker-Content-Digest": str(uuid4()),

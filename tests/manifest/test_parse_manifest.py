@@ -1,5 +1,5 @@
 import re
-from unittest import mock
+from unittest.mock import Mock
 from uuid import uuid4
 
 import pytest
@@ -13,7 +13,7 @@ from dreg_client.manifest import (
 
 @pytest.mark.parametrize("content_type", ("text/plain", "application/json", "text/html"))
 def test_unknown_contenttype_header(content_type: str):
-    response = mock.Mock()
+    response = Mock()
     response.headers = {
         "Content-Type": content_type,
     }
@@ -24,7 +24,7 @@ def test_unknown_contenttype_header(content_type: str):
 
 
 def test_missing_contenttype_header():
-    response = mock.Mock()
+    response = Mock()
     response.headers = {}
 
     errmsg = "^" + re.escape("Unknown Content-Type header in response.") + "$"
@@ -33,7 +33,7 @@ def test_missing_contenttype_header():
 
 
 def test_missing_digest_header():
-    response = mock.Mock()
+    response = Mock()
     response.headers = {
         "Content-Type": "application/vnd.docker.distribution.manifest.v2+json",
     }
@@ -44,7 +44,7 @@ def test_missing_digest_header():
 
 
 def test_missing_contentlength_header():
-    response = mock.Mock()
+    response = Mock()
     response.headers = {
         "Content-Type": "application/vnd.docker.distribution.manifest.v2+json",
         "Docker-Content-Digest": str(uuid4()),
@@ -56,7 +56,7 @@ def test_missing_contentlength_header():
 
 
 def test_invalid_contentlength_header():
-    response = mock.Mock()
+    response = Mock()
     response.headers = {
         "Content-Length": "docker",
         "Content-Type": "application/vnd.docker.distribution.manifest.v2+json",
@@ -71,7 +71,7 @@ def test_invalid_contentlength_header():
 
 
 def test_invalid_json():
-    response = mock.Mock()
+    response = Mock()
     response.headers = {
         "Content-Length": "42",
         "Content-Type": "application/vnd.docker.distribution.manifest.v2+json",
@@ -85,7 +85,7 @@ def test_invalid_json():
 
 
 def test_misrepresented_payload():
-    response = mock.Mock()
+    response = Mock()
     response.headers = {
         "Content-Length": "42",
         "Content-Type": "application/vnd.docker.distribution.manifest.v2+json",
@@ -101,7 +101,7 @@ def test_misrepresented_payload():
 
 
 def test_mismatched_content_type():
-    response = mock.Mock()
+    response = Mock()
     response.headers = {
         "Content-Length": "42",
         "Content-Type": "application/vnd.docker.distribution.manifest.v2+json",
@@ -118,7 +118,7 @@ def test_mismatched_content_type():
 
 
 def test_mismatched_list_content_type():
-    response = mock.Mock()
+    response = Mock()
     response.headers = {
         "Content-Length": "42",
         "Content-Type": "application/vnd.docker.distribution.manifest.list.v2+json",
