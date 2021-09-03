@@ -60,7 +60,7 @@ class Registry:
             repo: str
             ns: Optional[str]
             try:
-                ns, repo = name.split("/", 1)
+                ns, repo = name.split(sep="/", maxsplit=1)
             except ValueError:
                 ns = None
                 repo = name
