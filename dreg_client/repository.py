@@ -32,12 +32,12 @@ class Repository:
 
         return self._tags
 
-    def get_image(self, reference: str) -> Union[Image, LegacyManifest]:
-        manifest = self.get_manifest(reference)
+    def get_image(self, tag: str) -> Union[Image, LegacyManifest]:
+        manifest = self.get_manifest(tag)
         if isinstance(manifest, LegacyManifest):
             return manifest
         if isinstance(manifest, ManifestList):
-            return Image(self._client, manifest)
+            return Image(self._client, self.name, tag, manifest)
 
         # Synthesise a manifest list
         image_config = self._client.get_image_config_blob(self.name, manifest.config.digest)
@@ -79,10 +79,10 @@ class Repository:
             digest=digest,
             content_type=schema_2_list,
             content_length=content_length,
-            manifests=(manifest_ref,),
+            manifests={manifest_ref},
         )
 
-        return Image(self._client, manifest_list)
+        return Image(self._client, self.name, tag, manifest_list)
 
     def check_manifest(self, reference: str) -> Optional[str]:
         return self._client.check_manifest(self.name, reference)

@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass, field
-from typing import TYPE_CHECKING, Any, List, Mapping, Optional, Sequence, Union
+from typing import TYPE_CHECKING, AbstractSet, Any, List, Mapping, Optional, Sequence, Set, Union
 
 from .schemas import (
     known_manifest_content_types,
@@ -15,6 +15,10 @@ if TYPE_CHECKING:
     from requests import Response
 
 
+class InvalidPlatformNameError(ValueError):
+    pass
+
+
 @dataclass(frozen=True)
 class Platform:
     os: str
@@ -24,6 +28,24 @@ class Platform:
     @property
     def name(self) -> str:
         return "/".join(filter(None, (self.os, self.architecture, self.variant)))
+
+    @classmethod
+    def from_name(cls, name: str) -> Platform:
+        name_parts = name.split(sep="/", maxsplit=3)
+        if len(name_parts) == 2:
+            return Platform(
+                os=name_parts[0],
+                architecture=name_parts[1],
+                variant=None,
+            )
+        elif len(name_parts) == 3:
+            return Platform(
+                os=name_parts[0],
+                architecture=name_parts[1],
+                variant=name_parts[2],
+            )
+        else:
+            raise InvalidPlatformNameError(f"Invalid platform name '{name}' supplied.")
 
     @classmethod
     def extract(cls, data: Mapping[str, Any]) -> Platform:
@@ -160,7 +182,7 @@ class ManifestList:
     digest: str
     content_type: str
     content_length: int
-    manifests: Sequence[ManifestRef] = field(compare=False, repr=False)
+    manifests: AbstractSet[ManifestRef] = field(compare=False, repr=False)
 
 
 @dataclass(frozen=True)
@@ -263,9 +285,9 @@ def parse_manifest_response(response: Response) -> ManifestParseOutput:
 
         manifests_data = data["manifests"]
 
-        manifests: List[ManifestRef] = []
+        manifests: Set[ManifestRef] = set()
         for manifest_data in manifests_data:
-            manifests.append(
+            manifests.add(
                 ManifestRef(
                     digest=manifest_data["digest"],
                     content_type=manifest_data["mediaType"],
@@ -278,7 +300,7 @@ def parse_manifest_response(response: Response) -> ManifestParseOutput:
             digest=digest,
             content_type=content_type,
             content_length=content_length,
-            manifests=tuple(manifests),
+            manifests=frozenset(manifests),
         )
 
     raise UnusableManifestResponseError(response, "Unknown Content-Type header in response.")
@@ -289,12 +311,14 @@ __all__ = (
     "ImageConfigRef",
     "ImageHistoryItem",
     "ImageLayerRef",
+    "InvalidPlatformNameError",
     "LegacyManifest",
     "Manifest",
     "ManifestList",
     "ManifestRef",
     "Platform",
+    "UnusableImageConfigBlobResponseError",
+    "UnusableImageConfigBlobPayloadError",
     "UnusableManifestPayloadError",
     "UnusableManifestResponseError",
-    "parse_manifest_response",
 )
