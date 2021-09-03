@@ -38,3 +38,20 @@ known_tests = "tests"
 sections = "FUTURE,STDLIB,THIRDPARTY,FIRSTPARTY,TESTS,LOCALFOLDER"
 lines_after_imports = 2
 lines_between_sections = 1
+
+
+[tool.mypy]
+check_untyped_defs = true
+strict_equality = true
+warn_redundant_casts = true
+warn_unused_configs = true
+warn_unused_ignores = true
+
+[[tool.mypy.overrides]]
+module = [
+    "docker",
+    "docker.*",
+    "requests_toolbelt",
+    "requests_toolbelt.*",
+]
+ignore_missing_imports = true

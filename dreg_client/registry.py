@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Mapping, Optional, Sequence
+from typing import TYPE_CHECKING, Dict, Mapping, Optional, Sequence
 
 from .client import Client
 from .repository import Repository
@@ -15,9 +15,9 @@ if TYPE_CHECKING:
 
 class Registry:
     def __init__(self, client: Client) -> None:
-        self._client = client
-        self._repositories = {}
-        self._repositories_by_namespace = {}
+        self._client: Client = client
+        self._repositories: Dict[str, Repository] = {}
+        self._repositories_by_namespace: Dict[str, Dict[str, Repository]] = {}
 
     @classmethod
     def build_with_client(
@@ -57,6 +57,8 @@ class Registry:
     def refresh(self) -> None:
         repositories = self._client.catalog()["repositories"]
         for name in repositories:
+            repo: str
+            ns: Optional[str]
             try:
                 ns, repo = name.split("/", 1)
             except ValueError:

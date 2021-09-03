@@ -44,3 +44,8 @@ def test(c, onefile="", verbose=False):
         pytest_args.append(shlex.quote(onefile))
 
     c.run(" ".join(pytest_args), pty=pty)
+
+
+@task
+def type_check(c):
+    c.run("mypy dreg_client tests", pty=pty)

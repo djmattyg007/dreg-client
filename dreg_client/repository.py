@@ -18,7 +18,7 @@ class Repository:
         self.repository: str = repository
         self.namespace: Optional[str] = namespace
 
-        self._tags = None
+        self._tags: Optional[Sequence[str]] = None
 
     @property
     def name(self) -> str:
@@ -29,6 +29,9 @@ class Repository:
     def tags(self) -> Sequence[str]:
         if self._tags is None:
             self.refresh()
+
+        if self._tags is None:
+            raise TypeError("Loading repository tags failed.")
 
         return self._tags
 
@@ -66,7 +69,10 @@ class Repository:
 
     def refresh(self) -> None:
         response = self._client.get_repository_tags(self.name)
-        self._tags = tuple(response["tags"])
+        if response["tags"] is None:
+            self._tags = ()
+        else:
+            self._tags = tuple(response["tags"])
 
     def __repr__(self):
         return f"Repository({self.name})"

@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from pathlib import Path
+from typing import Sequence
 
 from dreg_client import Client, Manifest
 
@@ -28,6 +29,7 @@ def test_client_manifest_interactions(docker_client, registry):
 
     tags_response = client.get_repository_tags("x-dreg-example")
     assert tags_response["name"] == "x-dreg-example"
+    assert isinstance(tags_response["tags"], Sequence)
     assert sorted(tags_response["tags"]) == ["x-dreg-test"]
 
     manifest = client.get_manifest("x-dreg-example", "x-dreg-test")
