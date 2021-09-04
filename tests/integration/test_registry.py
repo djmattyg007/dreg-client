@@ -1,8 +1,11 @@
+import re
 from pathlib import Path
+from typing import cast
 from uuid import uuid4
 
 import pytest
 from docker import DockerClient
+from requests import HTTPError
 
 import dreg_client.repository as _repository
 from dreg_client import Image, Manifest, Platform, PlatformImage, Registry
@@ -72,3 +75,9 @@ def test_client_image_interactions_single_arch(docker_client: DockerClient, fixt
     assert isinstance(platform_image, PlatformImage)
     assert platform_image.digest == manifest.digest
     assert platform_image.platform_name == platform.name
+
+    # The manifest list was synthesised, so it shouldn't exist if we attempt to retrieve it from the registry.
+    errmsg = re.escape("404 Client Error")
+    with pytest.raises(HTTPError, match=errmsg) as exc_info:
+        repo.get_manifest(image.manifest_list.digest)
+    assert cast(HTTPError, exc_info.value).response.status_code == 404
