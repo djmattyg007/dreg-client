@@ -19,6 +19,9 @@ from .registry import Registry
 from .repository import LegacyImageRequestError, Repository
 
 
+__version__ = "1.0.0"
+
+
 __all__ = (
     "AuthService",
     "AuthServiceFailure",
