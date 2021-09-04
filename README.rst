@@ -2,7 +2,7 @@
 Docker Registry Client
 ======================
 
-|ci| |pypi| |license|
+|ci| |codecov| |pypi| |license|
 
 A Python REST client for Docker Registries. Pronounced ``dee-redge client``.
 
