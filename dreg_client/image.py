@@ -32,6 +32,10 @@ class PlatformImage:
     def platform_name(self) -> str:
         return self.config.platform_name
 
+    @property
+    def image_size(self) -> int:
+        return sum(map(lambda layer: layer.size, self.layers))
+
 
 class Image:
     def __init__(self, client: Client, repo: str, tag: str, manifest_list: ManifestList):

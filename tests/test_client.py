@@ -213,6 +213,7 @@ def test_get_manifest_success(manifest_v1: DockerJsonBlob):
             manifest1.digest
             == "sha256:1a067fa67b5bf1044c411ad73ac82cecd3d4dd2dabe7bc4d4b6dbbd55963b667"
         )
+        assert manifest1.short_digest == "1a067fa67b5b"
         assert manifest1.content_type == "application/vnd.docker.distribution.manifest.v1+prettyjws"
         assert manifest1.content == manifest_v1
 
@@ -223,6 +224,7 @@ def test_get_manifest_success(manifest_v1: DockerJsonBlob):
         assert isinstance(manifest2, LegacyManifest)
         assert manifest2 == manifest1
         assert manifest2.digest == manifest1.digest
+        assert manifest2.short_digest == manifest1.short_digest
         assert manifest2.content_type == manifest1.content_type
         assert manifest2.content == manifest1.content
 
@@ -320,6 +322,7 @@ def test_get_image_config_blob_success(blob_container_image_v1: DockerJsonBlob):
             config.digest
             == "sha256:1a067abcdef121044c411ad73ac82cecd098762dabe7bc4d4b6dbbd55963b667"
         )
+        assert config.short_digest == "1a067abcdef1"
         assert config.platform_name == "linux/amd64"
         assert config.platform == Platform("linux", "amd64", None)
         assert config.created_at == "2021-08-28T01:35:59.758616391Z"

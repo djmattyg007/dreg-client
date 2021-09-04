@@ -83,6 +83,7 @@ def test_get_image_legacy_manifest(manifest_client):
     image = repo.get_image("2021", raise_on_legacy=False)
     assert isinstance(image, LegacyManifest)
     assert image.digest == "sha256:fc7187188888f5192efdc08682d7fa260820a41f2bdd09b7f5f9cdcb53c9fbc0"
+    assert image.short_digest == "fc7187188888"
     manifest_client.get_manifest.assert_called_once_with("testns/testrepo", "2021")
     manifest_client.check_manifest.assert_not_called()
 
@@ -123,6 +124,7 @@ def test_get_manifest_by_tag(manifest_client):
     assert (
         manifest.digest == "sha256:fc7187188888f5192efdc08682d7fa260820a41f2bdd09b7f5f9cdcb53c9fbc0"
     )
+    assert manifest.short_digest == "fc7187188888"
     manifest_client.get_manifest.assert_called_once_with("testns/testrepo", "2021")
     manifest_client.check_manifest.assert_not_called()
 
@@ -136,6 +138,7 @@ def test_get_manifest_by_digest(manifest_client):
     assert (
         manifest.digest == "sha256:fc7187188888f5192efdc08682d7fa260820a41f2bdd09b7f5f9cdcb53c9fbc0"
     )
+    assert manifest.short_digest == "fc7187188888"
     manifest_client.get_manifest.assert_called_once_with(
         "testns/testrepo", "sha256:fc7187188888f5192efdc08682d7fa260820a41f2bdd09b7f5f9cdcb53c9fbc0"
     )

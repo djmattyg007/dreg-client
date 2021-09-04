@@ -9,6 +9,7 @@ from typing import (
     List,
     Mapping,
     Optional,
+    Protocol,
     Sequence,
     Set,
     Union,
@@ -28,6 +29,19 @@ if TYPE_CHECKING:
 
 class InvalidPlatformNameError(ValueError):
     pass
+
+
+class HasDigestProtocol(Protocol):
+    @property
+    def digest(self) -> str:
+        ...
+
+
+class DigestMixin:
+    @property
+    def short_digest(self: HasDigestProtocol) -> str:
+        # Returns the first 12 characters of a digest in the form of "sha256:abcdef1234567890..."
+        return self.digest[7:19]
 
 
 @dataclass(frozen=True)
@@ -89,7 +103,7 @@ class ImageHistoryItem:
 
 
 @dataclass(frozen=True)
-class ImageConfig:
+class ImageConfig(DigestMixin):
     digest: str
     content_length: int
     created_at: str = field(compare=False)
@@ -167,30 +181,34 @@ def parse_image_config_blob_response(response: Response) -> ImageConfig:
 
 
 @dataclass(frozen=True)
-class ImageLayerRef:
+class ImageLayerRef(DigestMixin):
     digest: str
     content_type: str
     size: int
 
 
 @dataclass(frozen=True)
-class ImageConfigRef:
+class ImageConfigRef(DigestMixin):
     digest: str
     content_type: str
     size: int
 
 
 @dataclass(frozen=True)
-class Manifest:
+class Manifest(DigestMixin):
     digest: str
     content_type: str
     content_length: int
     config: ImageConfigRef = field(compare=False, repr=False)
     layers: Sequence[ImageLayerRef] = field(compare=False, repr=False)
 
+    @property
+    def image_size(self) -> int:
+        return sum(map(lambda layer: layer.size, self.layers))
+
 
 @dataclass(frozen=True)
-class ManifestRef:
+class ManifestRef(DigestMixin):
     digest: str
     content_type: str
     size: int
@@ -202,7 +220,7 @@ class ManifestRef:
 
 
 @dataclass(frozen=True)
-class ManifestList:
+class ManifestList(DigestMixin):
     digest: str
     content_type: str
     content_length: int
@@ -210,7 +228,7 @@ class ManifestList:
 
 
 @dataclass(frozen=True)
-class LegacyManifest:
+class LegacyManifest(DigestMixin):
     digest: str
     content_type: str
     content_length: int
