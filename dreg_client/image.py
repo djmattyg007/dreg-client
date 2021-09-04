@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import dataclasses
-from typing import TYPE_CHECKING, AbstractSet, Optional, Sequence
+from typing import TYPE_CHECKING, AbstractSet, Iterable, Optional, Sequence
 
 from .manifest import ImageConfig, ImageLayerRef, Manifest, ManifestList, ManifestRef, Platform
 
@@ -69,6 +69,10 @@ class Image:
             config=config,
             layers=manifest.layers,
         )
+
+    def get_platform_images(self) -> Iterable[PlatformImage]:
+        for platform in self.platforms:
+            yield self.get_platform_image(platform)
 
     def _fetch_manifest(self, digest: str, errmsg: str) -> Manifest:
         manifest = self._client.get_manifest(self._repo, digest)

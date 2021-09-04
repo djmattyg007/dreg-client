@@ -75,6 +75,10 @@ def test_client_image_interactions_single_arch(docker_client: DockerClient, fixt
     assert platform_image.digest == manifest.digest
     assert platform_image.platform_name == platform.name
 
+    platform_images = tuple(image.get_platform_images())
+    assert len(platform_images) == 1
+    assert platform_images[0] == platform_image
+
     # The manifest list was synthesised, so it shouldn't exist if we attempt to retrieve it from the registry.
     errmsg = re.escape("404 Client Error")
     with pytest.raises(HTTPError, match=errmsg) as exc_info:
