@@ -2,6 +2,11 @@
 Changelog
 =========
 
+v1.0.2 - 2021-09-04
+===================
+
+Fixed a bug with the packaging + release process.
+
 v1.0.1 - 2021-09-04
 ===================
 
