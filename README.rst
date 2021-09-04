@@ -93,6 +93,7 @@ This fork is not a drop-in replacement for ``docker-registry-client``. Major cha
 - Complete removal of support for v1 registries
 - A re-work of class names
 - A re-work of the requests integration and registry auth service
+- More higher-level abstractions, to avoid needing to dive into manifest dictionaries
 
 Alternatives
 ============
