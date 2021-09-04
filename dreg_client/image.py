@@ -28,6 +28,10 @@ class PlatformImage:
     config: ImageConfig = dataclasses.field(compare=False, repr=False)
     layers: Sequence[ImageLayerRef] = dataclasses.field(compare=False, repr=False)
 
+    @property
+    def platform_name(self) -> str:
+        return self.config.platform_name
+
 
 class Image:
     def __init__(self, client: Client, repo: str, tag: str, manifest_list: ManifestList):

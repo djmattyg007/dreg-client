@@ -43,7 +43,15 @@ class Registry:
                 raise ValueError("Cannot specify namespace twice.")
             namespace, repository = repository.split("/", 1)
 
-        return Repository(self._client, repository, namespace=namespace)
+        if namespace:
+            name = f"{namespace}/{repository}"
+        else:
+            name = f"library/{repository}"
+
+        try:
+            return self._repositories[name]
+        except KeyError:
+            return Repository(self._client, repository, namespace=namespace)
 
     def repositories(self, namespace: Optional[str] = None) -> Mapping[str, Repository]:
         if not self._repositories:

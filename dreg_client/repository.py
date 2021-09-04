@@ -12,6 +12,10 @@ if TYPE_CHECKING:
     from requests import Response
 
 
+class LegacyImageRequestError(Exception):
+    pass
+
+
 class Repository:
     def __init__(self, client: Client, repository: str, namespace: Optional[str] = None):
         self._client: Client = client
@@ -35,9 +39,11 @@ class Repository:
 
         return self._tags
 
-    def get_image(self, tag: str) -> Union[Image, LegacyManifest]:
+    def get_image(self, tag: str, *, raise_on_legacy: bool = True) -> Union[Image, LegacyManifest]:
         manifest = self.get_manifest(tag)
         if isinstance(manifest, LegacyManifest):
+            if raise_on_legacy:
+                raise LegacyImageRequestError()
             return manifest
         if isinstance(manifest, ManifestList):
             return Image(self._client, self.name, tag, manifest)
@@ -78,4 +84,4 @@ class Repository:
         return f"Repository({self.name})"
 
 
-__all__ = ("Repository",)
+__all__ = ("LegacyImageRequestError", "Repository",)

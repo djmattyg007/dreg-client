@@ -16,7 +16,7 @@ from .manifest import (
     UnusableManifestResponseError,
 )
 from .registry import Registry
-from .repository import Repository
+from .repository import LegacyImageRequestError, Repository
 
 
 __all__ = (
@@ -28,6 +28,7 @@ __all__ = (
     "ImageConfig",
     "InvalidPlatformNameError",
     "LegacyManifest",
+    "LegacyImageRequestError",
     "Manifest",
     "ManifestList",
     "Platform",

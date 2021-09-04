@@ -9,9 +9,6 @@ from docker import DockerClient
 from dreg_client import Client, Manifest
 
 
-FIXTURES_DIR = Path(__file__).parent / "fixtures"
-
-
 @pytest.mark.usefixtures("registry")
 def test_client():
     client = Client.build_with_session("http://localhost:5000/v2/")
@@ -19,11 +16,11 @@ def test_client():
 
 
 @pytest.mark.usefixtures("registry")
-def test_client_manifest_interactions(docker_client: DockerClient):
+def test_client_manifest_interactions(docker_client: DockerClient, fixtures_dir: Path):
     client = Client.build_with_session("http://localhost:5000/v2/")
 
     docker_client.images.build(
-        path=str(FIXTURES_DIR / "base"),
+        path=str(fixtures_dir / "base"),
         tag="localhost:5000/x-dreg-example:x-dreg-test",
     )
 
