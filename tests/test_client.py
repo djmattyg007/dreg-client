@@ -2,7 +2,6 @@ from __future__ import annotations
 
 import json
 import re
-from typing import cast
 from unittest.mock import Mock
 
 import pytest
@@ -74,7 +73,7 @@ def test_catalog_failure():
         errmsg = re.escape("404 Client Error")
         with pytest.raises(HTTPError, match=errmsg) as exc_info:
             client.catalog()
-        assert cast(HTTPError, exc_info.value).response.status_code == 404
+        assert exc_info.value.response.status_code == 404
 
     with responses.RequestsMock() as rsps:
         rsps.add(rsps.GET, "https://registry.example.com:5000/v2/_catalog", body="{'abc'}")
@@ -106,7 +105,7 @@ def test_get_repository_tags_failure():
         errmsg = re.escape("404 Client Error")
         with pytest.raises(HTTPError, match=errmsg) as exc_info:
             client.get_repository_tags("testns/testrepo")
-        assert cast(HTTPError, exc_info.value).response.status_code == 404
+        assert exc_info.value.response.status_code == 404
 
     with responses.RequestsMock() as rsps:
         rsps.add(
@@ -177,7 +176,7 @@ def test_check_manifest_failure():
         errmsg = re.escape("500 Server Error")
         with pytest.raises(HTTPError, match=errmsg) as exc_info:
             client.check_manifest("testns/testrepo", "abcdef")
-        assert cast(HTTPError, exc_info.value).response.status_code == 500
+        assert exc_info.value.response.status_code == 500
 
 
 def test_get_manifest_success(manifest_v1: DockerJsonBlob):
@@ -241,7 +240,7 @@ def test_get_manifest_failure():
         errmsg = re.escape("404 Client Error")
         with pytest.raises(HTTPError, match=errmsg) as exc_info:
             client.get_manifest("testns/testrepo", "abcdef")
-        assert cast(HTTPError, exc_info.value).response.status_code == 404
+        assert exc_info.value.response.status_code == 404
 
     with responses.RequestsMock() as rsps:
         rsps.add(
@@ -292,7 +291,7 @@ def test_delete_manifest_failure():
                 "testns/testrepo",
                 "sha256:1a067fa67b5bf1044c411ad73ac82cecd3d4dd2dabe7bc4d4b6dbbd55963b667",
             )
-        assert cast(HTTPError, exc_info.value).response.status_code == 404
+        assert exc_info.value.response.status_code == 404
 
 
 def test_get_image_config_blob_success(blob_container_image_v1: DockerJsonBlob):
@@ -359,7 +358,7 @@ def test_get_blob_failure():
                 "testns/testrepo",
                 "sha256:1a067abcdef121044c411ad73ac82cecd098762dabe7bc4d4b6dbbd55963b667",
             )
-        assert cast(HTTPError, exc_info.value).response.status_code == 404
+        assert exc_info.value.response.status_code == 404
 
     with responses.RequestsMock() as rsps:
         rsps.add(
@@ -409,4 +408,4 @@ def test_delete_blob_failure():
                 "testns/testrepo",
                 "sha256:1a067abcdef121044c411ad73ac82cecd098762dabe7bc4d4b6dbbd55963b667",
             )
-        assert cast(HTTPError, exc_info.value).response.status_code == 404
+        assert exc_info.value.response.status_code == 404

@@ -1,6 +1,5 @@
 import re
 from pathlib import Path
-from typing import cast
 from uuid import uuid4
 
 import pytest
@@ -80,4 +79,4 @@ def test_client_image_interactions_single_arch(docker_client: DockerClient, fixt
     errmsg = re.escape("404 Client Error")
     with pytest.raises(HTTPError, match=errmsg) as exc_info:
         repo.get_manifest(image.manifest_list.digest)
-    assert cast(HTTPError, exc_info.value).response.status_code == 404
+    assert exc_info.value.response.status_code == 404
