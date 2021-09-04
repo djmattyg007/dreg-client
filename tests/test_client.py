@@ -2,11 +2,12 @@ from __future__ import annotations
 
 import json
 import re
+from typing import cast
 from unittest.mock import Mock
 
 import pytest
-import requests
 import responses
+from requests import HTTPError
 
 from dreg_client.auth_service import AuthService
 from dreg_client.client import Client
@@ -69,12 +70,11 @@ def test_catalog_failure():
         rsps.add(rsps.GET, "https://registry.example.com:5000/v2/_catalog", status=404)
 
         client = Client.build_with_session("https://registry.example.com:5000/v2/")
-        try:
+
+        errmsg = re.escape("404 Client Error")
+        with pytest.raises(HTTPError, match=errmsg) as exc_info:
             client.catalog()
-        except requests.HTTPError as exc:
-            assert exc.response.status_code == 404
-        else:
-            pytest.fail("Client.catalog() did not throw an exception for HTTP 404 as expected.")
+        assert cast(HTTPError, exc_info.value).response.status_code == 404
 
     with responses.RequestsMock() as rsps:
         rsps.add(rsps.GET, "https://registry.example.com:5000/v2/_catalog", body="{'abc'}")
@@ -102,14 +102,11 @@ def test_get_repository_tags_failure():
         )
 
         client = Client.build_with_session("https://registry.example.com:5000/v2/")
-        try:
+
+        errmsg = re.escape("404 Client Error")
+        with pytest.raises(HTTPError, match=errmsg) as exc_info:
             client.get_repository_tags("testns/testrepo")
-        except requests.HTTPError as exc:
-            assert exc.response.status_code == 404
-        else:
-            pytest.fail(
-                "Client.get_repository_tags() did not throw an exception for HTTP 404 as expected."
-            )
+        assert cast(HTTPError, exc_info.value).response.status_code == 404
 
     with responses.RequestsMock() as rsps:
         rsps.add(
@@ -176,14 +173,11 @@ def test_check_manifest_failure():
         )
 
         client = Client.build_with_session("https://registry.example.com:5000/v2/")
-        try:
+
+        errmsg = re.escape("500 Server Error")
+        with pytest.raises(HTTPError, match=errmsg) as exc_info:
             client.check_manifest("testns/testrepo", "abcdef")
-        except requests.HTTPError as exc:
-            assert exc.response.status_code == 500
-        else:
-            pytest.fail(
-                "Client.get_manifest() did not throw an exception for HTTP 500 as expected."
-            )
+        assert cast(HTTPError, exc_info.value).response.status_code == 500
 
 
 def test_get_manifest_success(manifest_v1: DockerJsonBlob):
@@ -243,14 +237,11 @@ def test_get_manifest_failure():
         )
 
         client = Client.build_with_session("https://registry.example.com:5000/v2/")
-        try:
+
+        errmsg = re.escape("404 Client Error")
+        with pytest.raises(HTTPError, match=errmsg) as exc_info:
             client.get_manifest("testns/testrepo", "abcdef")
-        except requests.HTTPError as exc:
-            assert exc.response.status_code == 404
-        else:
-            pytest.fail(
-                "Client.get_manifest() did not throw an exception for HTTP 404 as expected."
-            )
+        assert cast(HTTPError, exc_info.value).response.status_code == 404
 
     with responses.RequestsMock() as rsps:
         rsps.add(
@@ -294,17 +285,14 @@ def test_delete_manifest_failure():
         )
 
         client = Client.build_with_session("https://registry.example.com:5000/v2/")
-        try:
+
+        errmsg = re.escape("404 Client Error")
+        with pytest.raises(HTTPError, match=errmsg) as exc_info:
             client.delete_manifest(
                 "testns/testrepo",
                 "sha256:1a067fa67b5bf1044c411ad73ac82cecd3d4dd2dabe7bc4d4b6dbbd55963b667",
             )
-        except requests.HTTPError as exc:
-            assert exc.response.status_code == 404
-        else:
-            pytest.fail(
-                "Client.delete_manifest() did not throw an exception for HTTP 404 as expected."
-            )
+        assert cast(HTTPError, exc_info.value).response.status_code == 404
 
 
 def test_get_image_config_blob_success(blob_container_image_v1: DockerJsonBlob):
@@ -364,15 +352,14 @@ def test_get_blob_failure():
         )
 
         client = Client.build_with_session("https://registry.example.com:5000/v2/")
-        try:
+
+        errmsg = re.escape("404 Client Error")
+        with pytest.raises(HTTPError, match=errmsg) as exc_info:
             client.get_blob(
                 "testns/testrepo",
                 "sha256:1a067abcdef121044c411ad73ac82cecd098762dabe7bc4d4b6dbbd55963b667",
             )
-        except requests.HTTPError as exc:
-            assert exc.response.status_code == 404
-        else:
-            pytest.fail("Client.get_blob() did not throw an exception for HTTP 404 as expected.")
+        assert cast(HTTPError, exc_info.value).response.status_code == 404
 
     with responses.RequestsMock() as rsps:
         rsps.add(
@@ -415,12 +402,11 @@ def test_delete_blob_failure():
         )
 
         client = Client.build_with_session("https://registry.example.com:5000/v2/")
-        try:
+
+        errmsg = re.escape("404 Client Error")
+        with pytest.raises(HTTPError, match=errmsg) as exc_info:
             client.delete_blob(
                 "testns/testrepo",
                 "sha256:1a067abcdef121044c411ad73ac82cecd098762dabe7bc4d4b6dbbd55963b667",
             )
-        except requests.HTTPError as exc:
-            assert exc.response.status_code == 404
-        else:
-            pytest.fail("Client.delete_blob() did not throw an exception for HTTP 404 as expected.")
+        assert cast(HTTPError, exc_info.value).response.status_code == 404
