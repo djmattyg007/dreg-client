@@ -40,6 +40,12 @@ class Platform:
     def name(self) -> str:
         return "/".join(filter(None, (self.os, self.architecture, self.variant)))
 
+    def __str__(self) -> str:
+        return self.name
+
+    def __repr__(self) -> str:
+        return f"Platform({self.name})"
+
     @classmethod
     def extract(cls, data: Mapping[str, Any], /) -> Platform:
         return Platform(
