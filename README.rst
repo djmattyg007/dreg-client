@@ -8,7 +8,7 @@ A Python REST client for Docker Registries. Pronounced ``dee-redge client``.
 
 It's useful for automating image tagging and untagging
 
-.. |ci| image:: https://github.com/djmattyg007/dreg-client/workflows/CI/badge.svg?branch=master
+.. |ci| image:: https://github.com/djmattyg007/dreg-client/workflows/CI/badge.svg?branch=main
    :target: https://github.com/djmattyg007/dreg-client/actions?query=branch%3Amain+workflow%3ACI
    :alt: Build status
 .. |pypi| image:: https://img.shields.io/pypi/v/dreg-client.svg
