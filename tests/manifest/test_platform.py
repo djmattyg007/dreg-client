@@ -61,12 +61,14 @@ def test_from_too_long_name():
 
 
 def test_from_names():
-    platforms = Platform.from_names((
-        "linux/amd64",
-        "linux/arm64",
-        "darwin/arm64",
-        "linux/arm/v7",
-    ))
+    platforms = Platform.from_names(
+        (
+            "linux/amd64",
+            "linux/arm64",
+            "darwin/arm64",
+            "linux/arm/v7",
+        )
+    )
     assert len(platforms) == 4
     assert Platform(os="linux", architecture="amd64") in platforms
     assert Platform(os="linux", architecture="arm64") in platforms
