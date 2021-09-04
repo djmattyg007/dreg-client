@@ -1,15 +1,36 @@
 from __future__ import annotations
 
 import json
+import re
+from unittest.mock import Mock
 
 import pytest
 import requests
 import responses
 
+from dreg_client.auth_service import AuthService
 from dreg_client.client import Client
 from dreg_client.manifest import ImageConfig, LegacyManifest, Platform
 
 from .conftest import DockerJsonBlob
+
+
+def test_init_failure():
+    errmsg = "^" + re.escape("Cannot supply session.auth and auth_service together.") + "$"
+    session = Mock()
+    session.auth = ("username", "password")
+    with pytest.raises(ValueError, match=errmsg):
+        Client(session, auth_service=Mock(spec=AuthService))
+
+
+def test_build_with_session_failure():
+    errmsg = "^" + re.escape("Cannot supply auth and auth_service together.") + "$"
+    with pytest.raises(ValueError, match=errmsg):
+        Client.build_with_session(
+            "https://registry.example.com:5000/v2/",
+            auth=("username", "password"),
+            auth_service=Mock(spec=AuthService),
+        )
 
 
 def test_check_status_success():
