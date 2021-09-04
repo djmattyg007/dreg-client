@@ -14,20 +14,25 @@ if TYPE_CHECKING:
 
 
 class Registry:
-    def __init__(self, client: Client) -> None:
+    def __init__(self, client: Client, /) -> None:
         self._client: Client = client
         self._repositories: Dict[str, Repository] = {}
         self._repositories_by_namespace: Dict[str, Dict[str, Repository]] = {}
 
     @classmethod
     def build_with_client(
-        cls, session: BaseUrlSession, *, auth_service: Optional[AuthService] = None
+        cls, session: BaseUrlSession, /, *, auth_service: Optional[AuthService] = None
     ) -> Registry:
         return cls(Client(session, auth_service=auth_service))
 
     @classmethod
     def build_with_manual_client(
-        cls, base_url: str, *, auth: RequestsAuth = None, auth_service: Optional[AuthService] = None
+        cls,
+        base_url: str,
+        /,
+        *,
+        auth: RequestsAuth = None,
+        auth_service: Optional[AuthService] = None,
     ) -> Registry:
         return cls(Client.build_with_session(base_url, auth=auth, auth_service=auth_service))
 

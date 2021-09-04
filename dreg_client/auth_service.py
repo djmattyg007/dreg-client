@@ -43,20 +43,20 @@ class AuthService(Protocol):
 
 
 class DockerTokenAuthService(AuthService):
-    def __init__(self, session: BaseUrlSession):
+    def __init__(self, session: BaseUrlSession, /):
         self._session: BaseUrlSession = session
         self._saved_tokens: Dict[str, AuthToken] = {}
 
     @classmethod
     def build_with_session(
-        cls, base_url: str, service: str, auth: RequestsAuth = None
+        cls, base_url: str, service: str, /, *, auth: RequestsAuth = None
     ) -> DockerTokenAuthService:
         session = BaseUrlSession(base_url)
         session.params["service"] = service
         session.auth = auth
         return DockerTokenAuthService(session)
 
-    def request_token(self, scope: str) -> str:
+    def request_token(self, scope: str, /) -> str:
         saved_token = self._saved_tokens.get(scope)
         if saved_token:
             if saved_token.has_expired:

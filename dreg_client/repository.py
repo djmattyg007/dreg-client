@@ -39,7 +39,9 @@ class Repository:
 
         return self._tags
 
-    def get_image(self, tag: str, *, raise_on_legacy: bool = True) -> Union[Image, LegacyManifest]:
+    def get_image(
+        self, tag: str, /, *, raise_on_legacy: bool = True
+    ) -> Union[Image, LegacyManifest]:
         manifest = self.get_manifest(tag)
         if isinstance(manifest, LegacyManifest):
             if raise_on_legacy:
@@ -55,7 +57,7 @@ class Repository:
 
         return Image(self._client, self.name, tag, manifest_list)
 
-    def check_manifest(self, reference: str) -> Optional[str]:
+    def check_manifest(self, reference: str, /) -> Optional[str]:
         return self._client.check_manifest(self.name, reference)
 
     def get_manifest(self, reference: str) -> ManifestParseOutput:
@@ -64,13 +66,13 @@ class Repository:
         """
         return self._client.get_manifest(self.name, reference)
 
-    def delete_manifest(self, digest: str) -> Response:
+    def delete_manifest(self, digest: str, /) -> Response:
         return self._client.delete_manifest(self.name, digest)
 
-    def get_blob(self, digest: str) -> Response:
+    def get_blob(self, digest: str, /) -> Response:
         return self._client.get_blob(self.name, digest)
 
-    def delete_blob(self, digest: str) -> Response:
+    def delete_blob(self, digest: str, /) -> Response:
         return self._client.delete_blob(self.name, digest)
 
     def refresh(self) -> None:

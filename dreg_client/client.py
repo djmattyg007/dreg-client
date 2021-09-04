@@ -40,7 +40,7 @@ class TagsResponse(TypedDict):
 
 class Client:
     def __init__(
-        self, session: BaseUrlSession, *, auth_service: Optional[AuthService] = None
+        self, session: BaseUrlSession, /, *, auth_service: Optional[AuthService] = None
     ) -> None:
         if session.auth and auth_service:
             raise ValueError("Cannot supply session.auth and auth_service together.")
@@ -50,7 +50,12 @@ class Client:
 
     @classmethod
     def build_with_session(
-        cls, base_url: str, *, auth: RequestsAuth = None, auth_service: Optional[AuthService] = None
+        cls,
+        base_url: str,
+        /,
+        *,
+        auth: RequestsAuth = None,
+        auth_service: Optional[AuthService] = None,
     ) -> Client:
         if auth and auth_service:
             raise ValueError("Cannot supply auth and auth_service together.")

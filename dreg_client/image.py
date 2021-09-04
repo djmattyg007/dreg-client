@@ -61,7 +61,7 @@ class Image:
             )
         )
 
-    def get_platform_image(self, platform: Platform) -> PlatformImage:
+    def get_platform_image(self, platform: Platform, /) -> PlatformImage:
         manifest = self.fetch_manifest_by_platform(platform)
         config = self._client.get_image_config_blob(self._repo, manifest.config.digest)
         return PlatformImage(
@@ -77,7 +77,7 @@ class Image:
 
         return manifest
 
-    def fetch_manifest_by_platform_name(self, platform_name: str) -> Manifest:
+    def fetch_manifest_by_platform_name(self, platform_name: str, /) -> Manifest:
         matching_manifest_ref: Optional[ManifestRef] = None
         for manifest_ref in self._manifest_list.manifests:
             if manifest_ref.platform_name == platform_name:
@@ -95,7 +95,7 @@ class Image:
             "The digest matched by the selected platform did not represent a single platform manifest.",
         )
 
-    def fetch_manifest_by_platform(self, platform: Platform) -> Manifest:
+    def fetch_manifest_by_platform(self, platform: Platform, /) -> Manifest:
         matching_manifest_ref: Optional[ManifestRef] = None
         for manifest_ref in self._manifest_list.manifests:
             if manifest_ref.platform == platform:
@@ -113,7 +113,7 @@ class Image:
             "The digest matched by the selected platform did not represent a single platform manifest.",
         )
 
-    def fetch_manifest_by_digest(self, digest: str) -> Manifest:
+    def fetch_manifest_by_digest(self, digest: str, /) -> Manifest:
         return self._fetch_manifest(
             digest, "The specified digest did not represent a single platform manifest."
         )

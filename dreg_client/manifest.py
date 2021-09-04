@@ -30,7 +30,7 @@ class Platform:
         return "/".join(filter(None, (self.os, self.architecture, self.variant)))
 
     @classmethod
-    def from_name(cls, name: str) -> Platform:
+    def from_name(cls, name: str, /) -> Platform:
         name_parts = name.split(sep="/", maxsplit=3)
         if len(name_parts) == 2:
             return Platform(
@@ -48,7 +48,7 @@ class Platform:
             raise InvalidPlatformNameError(f"Invalid platform name '{name}' supplied.")
 
     @classmethod
-    def extract(cls, data: Mapping[str, Any]) -> Platform:
+    def extract(cls, data: Mapping[str, Any], /) -> Platform:
         return Platform(
             os=data["os"],
             architecture=data["architecture"],
