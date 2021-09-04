@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass, field
-from typing import TYPE_CHECKING, AbstractSet, Any, List, Mapping, Optional, Sequence, Set, Union
+from typing import TYPE_CHECKING, AbstractSet, Any, Iterable, List, Mapping, Optional, Sequence, Set, Union
 
 from .schemas import (
     known_manifest_content_types,
@@ -23,11 +23,19 @@ class InvalidPlatformNameError(ValueError):
 class Platform:
     os: str
     architecture: str
-    variant: Optional[str]
+    variant: Optional[str] = None
 
     @property
     def name(self) -> str:
         return "/".join(filter(None, (self.os, self.architecture, self.variant)))
+
+    @classmethod
+    def extract(cls, data: Mapping[str, Any], /) -> Platform:
+        return Platform(
+            os=data["os"],
+            architecture=data["architecture"],
+            variant=data.get("variant"),
+        )
 
     @classmethod
     def from_name(cls, name: str, /) -> Platform:
@@ -48,12 +56,11 @@ class Platform:
             raise InvalidPlatformNameError(f"Invalid platform name '{name}' supplied.")
 
     @classmethod
-    def extract(cls, data: Mapping[str, Any], /) -> Platform:
-        return Platform(
-            os=data["os"],
-            architecture=data["architecture"],
-            variant=data.get("variant"),
-        )
+    def from_names(cls, names: Iterable[str], /) -> AbstractSet[Platform]:
+        platforms = []
+        for name in names:
+            platforms.append(cls.from_name(name))
+        return frozenset(platforms)
 
 
 @dataclass(frozen=True)
