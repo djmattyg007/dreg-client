@@ -16,6 +16,8 @@ def test_extract_no_variant():
     assert platform.architecture == "amd64"
     assert platform.variant is None
     assert platform.name == "linux/amd64"
+    assert str(platform) == "linux/amd64"
+    assert repr(platform) == "Platform(linux/amd64)"
 
 
 def test_extract_with_variant():
@@ -30,6 +32,8 @@ def test_extract_with_variant():
     assert platform.architecture == "arm"
     assert platform.variant == "v7"
     assert platform.name == "linux/arm/v7"
+    assert str(platform) == "linux/arm/v7"
+    assert repr(platform) == "Platform(linux/arm/v7)"
 
 
 def test_from_short_name():
@@ -38,6 +42,8 @@ def test_from_short_name():
     assert platform.architecture == "arm64"
     assert platform.variant is None
     assert platform.name == "darwin/arm64"
+    assert str(platform) == "darwin/arm64"
+    assert repr(platform) == "Platform(darwin/arm64)"
 
 
 def test_from_too_short_name():
@@ -52,6 +58,8 @@ def test_from_long_name():
     assert platform.architecture == "arm"
     assert platform.variant == "v7"
     assert platform.name == "linux/arm/v7"
+    assert str(platform) == "linux/arm/v7"
+    assert repr(platform) == "Platform(linux/arm/v7)"
 
 
 def test_from_too_long_name():
