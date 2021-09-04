@@ -24,7 +24,9 @@ It's useful for automating image tagging and untagging
 Usage
 =====
 
-Most people will primarily use the ``Registry`` class::
+Most people will primarily use the ``Registry`` class:
+
+.. code-block:: python
 
     from dreg_client import Registry
 
@@ -37,7 +39,9 @@ Most people will primarily use the ``Registry`` class::
     test_repo = registry.repository("testrepo", "testns")  # a Repository object
     test_repo = registry.repository("testns/testrepo")  # an identical repository object
 
-The ``Repository`` class has several methods for interacting with individual repositories::
+The ``Repository`` class has several methods for interacting with individual repositories:
+
+.. code-block:: python
 
     from dreg_client import Repository, Manifest
 
@@ -54,6 +58,26 @@ The ``Repository`` class has several methods for interacting with individual rep
     # At the moment, retrieving and deleting blobs returns a requests Response object directly
     get_blob_response = test_repo.get_blob("sha256:ce17d456b9373523c40fe294e8918a10059f63c54edd2c8ead1f3079f7fbb22a")
     delete_blob_response = test_repo.delete_blob("sha256:ce17d456b9373523c40fe294e8918a10059f63c54edd2c8ead1f3079f7fbb22a")
+
+However, you're probably going to want to use the high-level ``get_image()`` method, which returns an ``Image`` object:
+
+.. code-block:: python
+
+    from dreg_client import Image, Platform
+
+    test_image = test_repo.get_image(tags[0])
+    assert isinstance(test_image, Image)
+
+    assert test_image.repo == "testns/testrepo"
+    assert test_image.tag == tags[0]
+
+    assert test_image.platforms == {
+        Platform.from_name("linux/amd64"),
+        Platform.from_name("linux/arm64"),
+        Platform.from_name("linux/arm/v7"),
+    }
+
+    platform_image = test_image.get_platform_image(Platform.from_name("linux/amd64"))
 
 History
 =======
