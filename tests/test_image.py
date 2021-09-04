@@ -30,10 +30,12 @@ def test_fetch_manifest_by_unknown_platform_name():
             "test",
             schema_2_list,
             42,
-            frozenset({
-                ManifestRef("testref", schema_2, 52, Platform.from_name("linux/arm64")),
-            }),
-        )
+            frozenset(
+                {
+                    ManifestRef("testref", schema_2, 52, Platform.from_name("linux/arm64")),
+                }
+            ),
+        ),
     )
 
     errmsg = "^" + re.escape("No manifest available for the selected platform in this image.") + "$"
@@ -63,10 +65,12 @@ def test_fetch_manifest_by_unknown_platform():
             "test",
             schema_2_list,
             42,
-            frozenset({
-                ManifestRef("testref", schema_2, 52, Platform.from_name("linux/arm64")),
-            }),
-        )
+            frozenset(
+                {
+                    ManifestRef("testref", schema_2, 52, Platform.from_name("linux/arm64")),
+                }
+            ),
+        ),
     )
 
     errmsg = "^" + re.escape("No manifest available for the selected platform in this image.") + "$"
