@@ -84,4 +84,7 @@ class Repository:
         return f"Repository({self.name})"
 
 
-__all__ = ("LegacyImageRequestError", "Repository",)
+__all__ = (
+    "LegacyImageRequestError",
+    "Repository",
+)

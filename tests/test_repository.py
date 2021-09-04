@@ -82,9 +82,7 @@ def test_get_image_legacy_manifest(manifest_client):
     repo = Repository(manifest_client, "testrepo", "testns")
     image = repo.get_image("2021", raise_on_legacy=False)
     assert isinstance(image, LegacyManifest)
-    assert (
-        image.digest == "sha256:fc7187188888f5192efdc08682d7fa260820a41f2bdd09b7f5f9cdcb53c9fbc0"
-    )
+    assert image.digest == "sha256:fc7187188888f5192efdc08682d7fa260820a41f2bdd09b7f5f9cdcb53c9fbc0"
     manifest_client.get_manifest.assert_called_once_with("testns/testrepo", "2021")
     manifest_client.check_manifest.assert_not_called()
 
