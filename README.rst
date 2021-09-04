@@ -11,6 +11,9 @@ It's useful for automating image tagging and untagging
 .. |ci| image:: https://github.com/djmattyg007/dreg-client/workflows/CI/badge.svg?branch=main
    :target: https://github.com/djmattyg007/dreg-client/actions?query=branch%3Amain+workflow%3ACI
    :alt: Build status
+.. |codecov| image:: https://codecov.io/gh/djmattyg007/dreg-client/branch/main/graph/badge.svg
+   :target: https://codecov.io/gh/djmattyg007/dreg-client
+   :alt: Code coverage
 .. |pypi| image:: https://img.shields.io/pypi/v/dreg-client.svg
    :target: https://pypi.org/project/dreg-client
    :alt: Latest version released on PyPI
