@@ -2,7 +2,13 @@
 Changelog
 =========
 
-v1.0.0 - unreleased
+v1.0.1 - 2021-09-04
+===================
+
+- Platform objects are now stringable
+- Added wrapper method ``get_platform_images`` to ``Image`` class
+
+v1.0.0 - 2021-09-04
 ===================
 
 Initial release after fork from upstream. To understand why the fork happened,
