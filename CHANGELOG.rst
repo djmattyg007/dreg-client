@@ -2,6 +2,19 @@
 Changelog
 =========
 
+v1.1.0 - 2021-09-05
+===================
+
+- Export ``ImageHistoryItem`` through the package entrypoint.
+- Add ``image_size`` property to ``PlatformImage`` and ``Manifest`` classes.
+- Add ``short_digest`` property to all data classes that have a ``digest`` property. This is meant
+  to mimic the short digests shown on Docker Hub.
+- Add ``non_empty_history`` property to ``ImageConfig`` class, to retrieve a list of only non-empty
+  layers. This is a convenience method to retrieve a list of history items that will nicely line up
+  with the list of downloadable layers.
+- Add ``clean_created_by`` property to ``ImageHistoryItem`` class, to centralise efforts for
+  providing "nice" displays of layer information.
+
 v1.0.2 - 2021-09-04
 ===================
 
