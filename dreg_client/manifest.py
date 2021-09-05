@@ -28,6 +28,8 @@ if TYPE_CHECKING:
 
 
 LAYER_HISTORY_INSTR_PREFIX = "/bin/sh -c #(nop)"
+LAYER_HISTORY_INSTR_SUFFIX_BUILDKIT = "# buildkit"
+LAYER_HISTORY_INSTR_RUN_WRAP_PREFIX = "RUN /bin/sh -c"
 
 
 class InvalidPlatformNameError(ValueError):
@@ -106,10 +108,15 @@ class ImageHistoryItem:
 
     @property
     def clean_created_by(self) -> str:
-        created_by = self.created_by
+        created_by = self.created_by.strip()
+
         if created_by.startswith(LAYER_HISTORY_INSTR_PREFIX):
-            created_by = created_by[len(LAYER_HISTORY_INSTR_PREFIX) :]
-        created_by = created_by.strip()
+            created_by = created_by[len(LAYER_HISTORY_INSTR_PREFIX) :].strip()
+        if created_by.endswith(LAYER_HISTORY_INSTR_SUFFIX_BUILDKIT):
+            created_by = created_by[:-len(LAYER_HISTORY_INSTR_SUFFIX_BUILDKIT)].strip()
+
+        if created_by.startswith(LAYER_HISTORY_INSTR_RUN_WRAP_PREFIX):
+            created_by = "RUN " + created_by[len(LAYER_HISTORY_INSTR_RUN_WRAP_PREFIX):].strip()
 
         return created_by
 
