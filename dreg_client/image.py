@@ -3,7 +3,15 @@ from __future__ import annotations
 import dataclasses
 from typing import TYPE_CHECKING, AbstractSet, Iterable, Optional, Sequence
 
-from .manifest import ImageConfig, ImageLayerRef, Manifest, ManifestList, ManifestRef, Platform
+from .manifest import (
+    DigestMixin,
+    ImageConfig,
+    ImageLayerRef,
+    Manifest,
+    ManifestList,
+    ManifestRef,
+    Platform,
+)
 
 
 if TYPE_CHECKING:
@@ -23,7 +31,7 @@ class UnexpectedImageManifestError(Exception):
 
 
 @dataclasses.dataclass(frozen=True)
-class PlatformImage:
+class PlatformImage(DigestMixin):
     digest: str
     config: ImageConfig = dataclasses.field(compare=False, repr=False)
     layers: Sequence[ImageLayerRef] = dataclasses.field(compare=False, repr=False)
