@@ -27,6 +27,9 @@ if TYPE_CHECKING:
     from requests import Response
 
 
+LAYER_HISTORY_INSTR_PREFIX = "/bin/sh -c #(nop)"
+
+
 class InvalidPlatformNameError(ValueError):
     pass
 
@@ -100,6 +103,15 @@ class ImageHistoryItem:
     created_by: str = field(repr=False)
     empty_layer: bool = field(compare=False)
     comment: str = field(compare=False, repr=False)
+
+    @property
+    def clean_created_by(self) -> str:
+        created_by = self.created_by
+        if created_by.startswith(LAYER_HISTORY_INSTR_PREFIX):
+            created_by = created_by[len(LAYER_HISTORY_INSTR_PREFIX):]
+        created_by = created_by.strip()
+
+        return created_by
 
 
 @dataclass(frozen=True)
