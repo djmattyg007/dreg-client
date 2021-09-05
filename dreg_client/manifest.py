@@ -108,7 +108,7 @@ class ImageHistoryItem:
     def clean_created_by(self) -> str:
         created_by = self.created_by
         if created_by.startswith(LAYER_HISTORY_INSTR_PREFIX):
-            created_by = created_by[len(LAYER_HISTORY_INSTR_PREFIX):]
+            created_by = created_by[len(LAYER_HISTORY_INSTR_PREFIX) :]
         created_by = created_by.strip()
 
         return created_by
