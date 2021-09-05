@@ -116,6 +116,10 @@ class ImageConfig(DigestMixin):
     def platform_name(self) -> str:
         return self.platform.name
 
+    @property
+    def non_empty_history(self) -> Iterable[ImageHistoryItem]:
+        return filter(lambda item: not item.empty_layer, self.history)
+
 
 class UnusableImageConfigBlobResponseError(Exception):
     def __init__(self, response: Response, message: str):
