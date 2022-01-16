@@ -2,6 +2,15 @@
 Changelog
 =========
 
+v1.2.0 - 2021-09-05
+===================
+
+- Add digest methods to ``PlatformImage`` class.
+- Formally declare support for python 3.10.
+- Bump minimum supported version of requests
+- Fix some issues with the tests (type-checking and a broken assert statement).
+- Add a shebang to the show script.
+
 v1.1.0 - 2021-09-05
 ===================
 
