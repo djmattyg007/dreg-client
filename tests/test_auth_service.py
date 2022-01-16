@@ -227,7 +227,6 @@ def test_repeat_request_token(auth_service: DockerTokenAuthService, token_field:
             callback=cbreq(mkbody),
             match_querystring=True,
         )
-        assert rsps._matches[0].match_querystring is True
 
         with freeze_time() as frozen_datetime:
             orig_token = auth_service.request_token(scope)
