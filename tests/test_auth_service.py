@@ -1,6 +1,6 @@
 import json
 import re
-from datetime import datetime
+from datetime import datetime, timedelta
 from typing import Any, Callable, Mapping, Tuple
 from uuid import uuid4
 
@@ -176,7 +176,7 @@ def test_has_auth_token_expired(validity_duration: int, time_to_pass: int, expir
             expires_at=make_expires_at(validity_duration),
         )
 
-        frozen_datetime.tick(time_to_pass)
+        frozen_datetime.tick(timedelta(seconds=time_to_pass))
 
         assert token.has_expired == expired
 
@@ -232,15 +232,16 @@ def test_repeat_request_token(auth_service: DockerTokenAuthService, token_field:
         with freeze_time() as frozen_datetime:
             orig_token = auth_service.request_token(scope)
 
+            tick_length = timedelta(seconds=5)
             for _ in range(11):
                 re_token = auth_service.request_token(scope)
                 assert re_token == orig_token
-                frozen_datetime.tick(5)
+                frozen_datetime.tick(tick_length)
 
             next_token = auth_service.request_token(scope)
             assert next_token != orig_token
 
-            frozen_datetime.tick(10)
+            frozen_datetime.tick(timedelta(seconds=10))
             re_next_token = auth_service.request_token(scope)
             assert re_next_token == next_token
 
@@ -278,8 +279,9 @@ def test_repeat_request_token_different_scope(
             requested_repo_token = auth_service.request_token(repo_scope)
             assert requested_repo_token == repo_token
 
+            tick_length = timedelta(seconds=5)
             for _ in range(10):
-                frozen_datetime.tick(5)
+                frozen_datetime.tick(tick_length)
                 re_requested_catalog_token = auth_service.request_token(catalog_scope)
                 assert re_requested_catalog_token == catalog_token
 
