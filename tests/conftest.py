@@ -50,7 +50,7 @@ def wait_till_up(url: str, attempts: int) -> None:
             requests.get(url)
             return
         except exceptions.ConnectionError:
-            time.sleep(0.1 * 2 ** i)
+            time.sleep(0.1 * 2**i)
     else:
         requests.get(url)
 
