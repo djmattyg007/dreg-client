@@ -12,7 +12,7 @@ from .manifest import (
     parse_image_config_blob_response,
     parse_manifest_response,
 )
-from .schemas import schema_2, schema_2_list
+from .schemas import schema_2, schema_2_list, schema_oci, schema_oci_list
 
 
 if TYPE_CHECKING:
@@ -120,7 +120,7 @@ class Client:
 
     def check_manifest(self, name: str, reference: str) -> Optional[str]:
         headers: HEADERS = {
-            "Accept": ",".join((schema_2, schema_2_list)),
+            "Accept": ",".join((schema_2, schema_2_list, schema_oci, schema_oci_list)),
         }
         try:
             response = self._head(
@@ -135,7 +135,7 @@ class Client:
 
     def get_manifest(self, name: str, reference: str) -> ManifestParseOutput:
         headers: HEADERS = {
-            "Accept": ",".join((schema_2, schema_2_list)),
+            "Accept": ",".join((schema_2, schema_2_list, schema_oci, schema_oci_list)),
         }
         response = self._get(f"{name}/manifests/{reference}", scope_repo(name), headers=headers)
 

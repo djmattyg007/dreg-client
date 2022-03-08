@@ -20,6 +20,8 @@ from .schemas import (
     legacy_manifest_content_types,
     schema_2,
     schema_2_list,
+    schema_oci,
+    schema_oci_list,
 )
 
 
@@ -314,12 +316,7 @@ def parse_manifest_response(response: Response) -> ManifestParseOutput:
     if data.get("schemaVersion") != 2:
         raise UnusableManifestPayloadError(response, data, "Unknown schema version in payload.")
 
-    if content_type == schema_2:
-        if data.get("mediaType") != content_type:
-            raise UnusableManifestPayloadError(
-                response, data, "Mismatched media type between headers and payload."
-            )
-
+    if content_type in (schema_2, schema_oci):
         config_data = data["config"]
         layers_data = data["layers"]
 
@@ -347,12 +344,7 @@ def parse_manifest_response(response: Response) -> ManifestParseOutput:
             layers=tuple(layers),
         )
 
-    if content_type == schema_2_list:
-        if data.get("mediaType") != content_type:
-            raise UnusableManifestPayloadError(
-                response, data, "Mismatched media type between headers and payload."
-            )
-
+    if content_type in (schema_2_list, schema_oci_list):
         manifests_data = data["manifests"]
 
         manifests: Set[ManifestRef] = set()
