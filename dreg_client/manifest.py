@@ -317,6 +317,12 @@ def parse_manifest_response(response: Response) -> ManifestParseOutput:
         raise UnusableManifestPayloadError(response, data, "Unknown schema version in payload.")
 
     if content_type in (schema_2, schema_oci):
+        # OCI image does not set mediaType in data
+        if content_type == schema_2 and data.get("mediaType") != content_type:
+            raise UnusableManifestPayloadError(
+                response, data, "Mismatched media type between headers and payload."
+            )
+
         config_data = data["config"]
         layers_data = data["layers"]
 
@@ -345,6 +351,12 @@ def parse_manifest_response(response: Response) -> ManifestParseOutput:
         )
 
     if content_type in (schema_2_list, schema_oci_list):
+        # OCI image does not set mediaType in data
+        if content_type == schema_2_list and data.get("mediaType") != content_type:
+            raise UnusableManifestPayloadError(
+                response, data, "Mismatched media type between headers and payload."
+            )
+
         manifests_data = data["manifests"]
 
         manifests: Set[ManifestRef] = set()
